@@ -37,7 +37,7 @@
     }
   ],
   "repository": {
-    "type": "github",
+    "type": "git",
     "url": "https://github.com/Jaynator495/nbbcjs"
   },
   "dependencies": {
