@@ -1,5 +1,9 @@
 # The New BBCode Parser JS (NBBCJS)
 
+[![Style, Unit, and Build tests](https://github.com/QuestionCove/nbbcjs/actions/workflows/test.yml/badge.svg)](https://github.com/QuestionCove/nbbcjs/actions/workflows/test.yml)
+
+## Table of Contents
+
 - [The New BBCode Parser JS (NBBCJS)](#the-new-bbcode-parser-js-nbbcjs)
   - [Overview](#overview)
   - [Usage](#usage)
