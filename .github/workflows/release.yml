@@ -37,15 +37,6 @@ jobs:
           asset_content_type: application/javascript
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload Sourcemap
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_name: ${{env.PACKAGE_NAME}}-${{env.PACKAGE_VERSION}}.js.map
-          asset_path: ./build/dist/nbbc.js.map
-          asset_content_type: application/javascript
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      - run: npm publish
 #        env:
 #          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
