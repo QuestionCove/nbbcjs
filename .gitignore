@@ -1,0 +1,7 @@
+build
+.vscode
+node_modules
+*.php
+*.txt
+coverage
+nbbc_test.ts

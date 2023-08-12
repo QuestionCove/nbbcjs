@@ -1,0 +1,65 @@
+{
+  "name": "nbbcjs",
+  "version": "1.0.0",
+  "description": "NodeJS Implementation of the PHP NBBC BBCode Parser, a fast extensible BBCode parser",
+  "main": "build/src/nbbc.js",
+  "types": "build/src/nbbc.d.ts",
+  "scripts": {
+    "test": "jest",
+    "coverage": "jest --collectCoverage --",
+    "prepublish": "npx tsc",
+    "build": "npx tsc && npx webpack"
+  },
+  "keywords": [
+    "bbcode",
+    "nbbc",
+    "extensible",
+    "fast"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "author": "Jaynator495",
+  "contributors": [
+    {
+      "name": "Jaynator495",
+      "email": "contact@questioncove.com"
+    },
+    {
+      "name": "Todd Burry",
+      "email": "todd@vanillaforums.com"
+    },
+    {
+      "name": "TheYak"
+    },
+    {
+      "name": "Sean Werkema"
+    }
+  ],
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/Jaynator495/nbbcjs"
+  },
+  "dependencies": {
+    "locutus": "^2.0.16"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "@types/locutus": "^0.0.6",
+    "@types/node": "^20.4.7",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1",
+    "eslint": "^8.46.0",
+    "jest": "^29.6.2",
+    "ts-jest": "^29.1.1",
+    "ts-loader": "^9.4.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "license": "BSD-2-Clause",
+  "directories": {
+    "test": "tests"
+  }
+}

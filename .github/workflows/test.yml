@@ -1,0 +1,54 @@
+name: Style, Unit, and Build tests
+
+on: [push, pull_request]
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8.6.6
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        check-latest: true
+    - run: pnpm i 
+    - run: pnpx eslint .
+  test: 
+    needs: eslint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8.6.6
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        check-latest: true
+    - run: pnpm i 
+    - run: pnpm run test
+  buildtest: 
+    needs: eslint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8.46.0
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        check-latest: true
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Build Artifacts
+        path: build
+    - run: pnpm i 
+    - run: pnpm run build

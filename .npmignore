@@ -1,0 +1,9 @@
+node_modules
+.vscode
+*.php
+*.txt
+coverage
+nbbc_test.ts
+.github
+jest.config.json
+tests
