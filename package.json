@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "coverage": "jest --collectCoverage --",
-    "prepublish": "npx tsc",
+    "prepublish": "pnpm run build",
     "build": "npx tsc && npx webpack"
   },
   "keywords": [
