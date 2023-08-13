@@ -17,7 +17,6 @@ import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTy
 //PHP Methods
 //TODO: Replace all PHP methods with native JavaScript
 import array_flip from 'locutus/php/array/array_flip';
-import array_pop from 'locutus/php/array/array_pop';
 import basename from "locutus/php/filesystem/basename";
 import empty from "locutus/php/var/empty";
 import html_entity_decode from 'locutus/php/strings/html_entity_decode';
@@ -996,7 +995,7 @@ export default class BBCode {
         }
         let $output = [];
         while (this.$stack.length > $pos) {
-            const $token = array_pop(this.$stack);
+            const $token = this.$stack.pop();
             if ($token[BBStack.TOKEN] != BBToken.TAG) {
                 // Not a tag, so just push it to the output.
                 $output.push($token);
@@ -1023,7 +1022,7 @@ export default class BBCode {
                     'before_tag': null
                 }, ...$rule};
                 const $end_tag = $rule['end_tag'];
-                array_pop(this.$start_tags[$name]); // Remove the locator for this tag.
+                this.$start_tags[$name].pop(); // Remove the locator for this tag.
                 if ($end_tag == BBType.PROHIBIT) {
                     // Broken tag, so just push it to the output as HTML.
                     $output.push({
@@ -1131,7 +1130,7 @@ export default class BBCode {
         const $output = this.generateOutput($pos + 1);
         // Push the clean tokens back onto the stack.
         while ($output.length) {
-            const $token = array_pop($output);
+            const $token = $output.pop();
             $token[BBStack.CLASS] = this.$current_class;
             this.$stack.push($token);
         }
@@ -1163,7 +1162,7 @@ export default class BBCode {
         // faster, for whatever that's worth.)  But even a constant-time speedup is a
         // speedup, so this is overall a win.
         if (this.$start_tags[$tag_name] && this.$start_tags[$tag_name].length)
-            $pos = array_pop(this.$start_tags[$tag_name]);
+            $pos = this.$start_tags[$tag_name].pop();
         else
             $pos = -1;
         if (this.$debug)
@@ -1205,7 +1204,7 @@ export default class BBCode {
             Debugger.debug("Internal_FinishTag:", `whitespace cleanup: popping ${$delta} items`);
         // Clean up any 'after_tag' whitespace we skipped.
         while ($delta-- > 0)
-            array_pop(this.$stack);
+            this.$stack.pop();
         this.computeCurrentClass();
         if (this.$debug)
             Debugger.debug("Internal_FinishTag: output:", $fulloutput);
@@ -1278,15 +1277,15 @@ export default class BBCode {
             switch ($char) {
             case 's':
                 while ($array.length > 0 && $array[$array.length - 1][BBStack.TOKEN] == BBToken.WS)
-                    array_pop($array);
+                    $array.pop();
                 break;
             case 'n':
                 if ($array.length > 0 && $array[$array.length - 1][BBStack.TOKEN] == BBToken.NL)
-                    array_pop($array);
+                    $array.pop();
                 break;
             case 'a':
                 while ($array.length > 0 && (($token = $array[$array.length - 1][BBStack.TOKEN]) == BBToken.WS || $token == BBToken.NL))
-                    array_pop($array);
+                    $array.pop();
                 break;
             }
         }
@@ -2018,7 +2017,7 @@ export default class BBCode {
         // tag, and push the result back onto the stack as plain HTML.
         // We don't need to run a BBCODE_CHECK on the start tag, because it was already
         // done when the tag was pushed onto the stack.
-        const $start_tag_node = array_pop(this.$stack);
+        const $start_tag_node = this.$stack.pop();
         const $start_tag_params = $start_tag_node[BBStack.TAG];
         this.computeCurrentClass();
         if (this.$tag_rules[$tag_name] && this.$tag_rules[$tag_name]['before_tag']) {
