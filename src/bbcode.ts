@@ -35,7 +35,6 @@ import strrchr from "locutus/php/strings/strrchr";
 import substr from 'locutus/php/strings/substr';
 import trim from 'locutus/php/strings/trim';
 import urlencode from 'locutus/php/url/urlencode';
-import strcasecmp from "locutus/php/strings/strcasecmp";
 
 export default class BBCode {
     /**
@@ -1746,7 +1745,7 @@ export default class BBCode {
         this.$lexer.$verbatim = true;
         let $token_type: BBToken, $newstart, $end_tag_params, $text;
         while (($token_type = this.$lexer.nextToken()) != BBToken.EOI) {
-            if (strcasecmp(this.$lexer.$text, $end_tag) === 0) {
+            if (this.$lexer.$text.toLowerCase() == $end_tag.toLowerCase()) {
                 // Found the end tag, so we're done.
                 $end_tag_params = $end_tag;
                 break;
