@@ -36,7 +36,6 @@ import substr from 'locutus/php/strings/substr';
 import trim from 'locutus/php/strings/trim';
 import urlencode from 'locutus/php/url/urlencode';
 import strcasecmp from "locutus/php/strings/strcasecmp";
-import array_splice from "locutus/php/array/array_splice";
 
 export default class BBCode {
     /**
@@ -1824,7 +1823,7 @@ export default class BBCode {
         if (this.$debug) {
             Debugger.debug("Internal_ProcessVerbatimTag:", `removing stack elements starting at ${$start} (stack has ${this.$stack.length} elements).`);
         }
-        array_splice(this.$stack, $start);
+        this.$stack.splice($start);
         this.computeCurrentClass();
         // Clean up whitespace before the start tag (the tag was never pushed
         // onto the stack itself, so we don't need to remove it).
