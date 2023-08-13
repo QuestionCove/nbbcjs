@@ -36,7 +36,6 @@ import substr from 'locutus/php/strings/substr';
 import trim from 'locutus/php/strings/trim';
 import urlencode from 'locutus/php/url/urlencode';
 import strcasecmp from "locutus/php/strings/strcasecmp";
-import array_slice from "locutus/php/array/array_slice";
 import array_splice from "locutus/php/array/array_splice";
 
 export default class BBCode {
@@ -1792,7 +1791,7 @@ export default class BBCode {
             this.$lexer.restoreState($state);
             // Rewind the stack too, since right now we've put all the stuff
             // since the code tag on, and it should be taken off.
-            this.$stack = array_slice(this.$stack, 0, $start);
+            this.$stack = this.$stack.slice(0, $start);
             this.$stack.push({
                 [BBStack.TOKEN]: BBToken.TEXT,
                 [BBStack.TEXT]: this.fixupOutput(this.$lexer.$text),
