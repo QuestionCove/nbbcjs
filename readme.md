@@ -34,6 +34,12 @@ In an NPM environment, you can install the library with:
 npm i nbbcjs
 ```
 
+Or if you are using this in a browser, include the javascript file by downloading it from the releases and including it, or using unpkg like so:
+
+```html
+<script src="https://www.unpkg.com/nbbcjs@latest/build/dist/nbbc.js"></script>
+```
+
 After it's installed, refer to [Usage](#usage)
 
 ## Usage
@@ -89,7 +95,7 @@ Additionally, for BBMode.CALLBACK, there is a new element called `callback`, whi
 - NBBC was originally developed by [Sean Werkema](https://github.com/seanofw) in 2008-10, and most of the core code is his.  He last officially worked on it in September 2010, after which it sat dormant for a few years while he did Other Things, mostly involving Gainful Employment and Wife and Kids.  His last commit was on v1.4.5.
 - [Theyak](https://github.com/theyak) imported it from SourceForge into Github in 2013, and did some maintenance work, fixing bugs and adding some minor enhancements from 2013-5.  The Git history of this repository dates back to this point, condensing the prior Subversion history to a single commit.
 - The [Vanilla Forums Team](https://github.com/vanilla) did some major work to upgrade Theyak's copy of NBBC to support modern PHP 5/6/7, and they're responsible for v2.x and later versions.
-- The [QuestionCove Team](https://github.com/questioncove) did some major work to port this over TypeScript. That is where this respository beings.
+- The [QuestionCove Team](https://github.com/questioncove) did some major work to port this over TypeScript. That is where this respository begins.
 
 ## License
 
