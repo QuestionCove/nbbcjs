@@ -23,7 +23,6 @@ import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
 import in_array from 'locutus/php/array/in_array';
 import parse_url from 'locutus/php/url/parse_url';
-import preg_match from 'locutus/php/pcre/preg_match';
 import preg_quote from "locutus/php/pcre/preg_quote";
 import preg_replace from 'locutus/php/pcre/preg_replace';
 import rawurlencode from 'locutus/php/url/rawurlencode';
@@ -520,7 +519,7 @@ export default class BBCode {
         }
         // Check for anything that does *not* have a colon in it before the first
         // slash or question mark or #; that indicates a local file relative to us.
-        if (preg_match("^[^:]+([\\/\\\\?#][^\\r\\n]*)?$", $string)) {
+        if (/^[^:]+([\\/\\\\?#][^\\r\\n]*)?$/.test($string)) {
             return true;
         }
         // Match mail addresses.
@@ -758,12 +757,12 @@ export default class BBCode {
                 $urlParts = parse_url($part);
             }
             // Fix parts that are just single domains.
-            if ($urlParts !== false && preg_match(`^${$hostRegex}$`, $part)) {
+            if ($urlParts !== false && new RegExp(`^${$hostRegex}$`).test($part)) {
                 $urlParts['host'] = $part;
                 delete $urlParts['path'];
             }
             // Look for an email address.
-            if (preg_match(`^${$emailRegex}$`, $part)) {
+            if (new RegExp(`^${$emailRegex}$`).test($part)) {
                 $urlParts = {
                     'url': `mailto:${$part}`,
                     'host': $part
@@ -828,7 +827,7 @@ export default class BBCode {
         const $tld = trim(strrchr($host, '.'), '.');
         // Check against the known TLDs.
         // We'll just assume that two letter TLDs are valid to avoid too many checks.
-        if (in_array($tld, $validTLDs) || preg_match('^[a-z]{2}$', $tld)) {
+        if (in_array($tld, $validTLDs) || /^[a-z]{2}$/.test($tld)) {
             return true;
         }
         return false;

@@ -10,7 +10,6 @@ import preg_split, {PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY} from "../modu
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import preg_replace from "locutus/php/pcre/preg_replace";
-import preg_match from "locutus/php/pcre/preg_match";
 import ord from "locutus/php/strings/ord";
 import substr from "locutus/php/strings/substr";
 import empty from "locutus/php/var/empty";
@@ -28,9 +27,9 @@ export default class BBCodeLexer {
     public $tagmarker: string;        // Which kind of tag marker we're using:  "[", "<", "(", or "{"
     public $end_tagmarker: string;    // The ending tag marker:  "]", ">", "(", or "{"
     public $pat_main: string|RegExp;        // Main tag-matching pattern.
-    public $pat_comment: string|RegExp;    // Pattern for matching comments.
-    public $pat_comment2: string|RegExp;    // Pattern for matching comments.
-    public $pat_wiki: string|RegExp;        // Pattern for matching wiki-links.
+    public $pat_comment: RegExp;    // Pattern for matching comments.
+    public $pat_comment2: RegExp;    // Pattern for matching comments.
+    public $pat_wiki: RegExp;        // Pattern for matching wiki-links.
     /**
      * Instantiate a new instance of the {@link BBCodeLexer} class.
      *
@@ -105,9 +104,9 @@ export default class BBCodeLexer {
             +")/Dx";
         this.$input = preg_split(this.$pat_main, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
         // Patterns for matching specific types of tokens during lexing. (originally contained Dx flags)
-        this.$pat_comment = `^${$b}(?:--|')`;
-        this.$pat_comment2 = `^${$b}!--(?:[^-]|-[^-]|--[^${$e}])*--${$e}$`;
-        this.$pat_wiki = `^${$b}${$b}([^\\|]*)(?:\\|(.*))?${$e}${$e}$`;
+        this.$pat_comment = new RegExp(`^${$b}(?:--|')`);
+        this.$pat_comment2 = new RegExp(`^${$b}!--(?:[^-]|-[^-]|--[^${$e}])*--${$e}$`);
+        this.$pat_wiki = new RegExp(`^${$b}${$b}([^\\|]*)(?:\\|(.*))?${$e}${$e}$`);
         // Current lexing state.
         this.$ptr = 0;
         this.$unget = false;
@@ -247,7 +246,7 @@ export default class BBCodeLexer {
                     return this.$token = BBToken.NL;
                 case 45:
                     // A rule made of hyphens; return it as a [rule] tag.
-                    if (preg_match("^-----", this.$text)) {
+                    if (/^-----/.test(this.$text)) {
                         this.$tag = {
                             "_name": "rule",
                             "_endtag": false,
@@ -276,18 +275,17 @@ export default class BBCodeLexer {
                     // Tag or comment.  This is the most complicated one, because it
                     // needs to be parsed into its component pieces.
                     // See if this is a comment; if so, skip it.
-                    if (preg_match(this.$pat_comment, this.$text)) {
+                    if (this.$pat_comment.test(this.$text)) {
                         // This is a comment, not a tag, so treat it like it doesn't exist.
                         this.$state = LexState.TEXT;
                         break;
                     }
-                    if (preg_match(this.$pat_comment2, this.$text)) {
+                    if (this.$pat_comment2.test(this.$text)) {
                         // This is a comment, not a tag, so treat it like it doesn't exist.
                         this.$state = LexState.TEXT;
                         break;
                     }
                     // See if this is a [[wiki link]]; if so, convert it into a [wiki="" title=""] tag.
-                    //preg_match(this.$pat_wiki, this.$text, $matches)
                     if (($matches = this.$text.match(this.$pat_wiki))) {
                         $matches = {...{1: null, 2: null}, ...$matches};
                         this.$tag = {
@@ -414,9 +412,9 @@ export default class BBCodeLexer {
         const $piece = $pieces[$ptr];
         if ($piece == '=') {
             return '=';
-        } else if (preg_match("^[\\'\\\"]", $piece)) {
+        } else if (/^['"]/.test($piece)) {
             return '"';
-        } else if (preg_match("^[\\x00-\\x20]+$", $piece)) {
+        } else if (/^[\x00-\x20]+$/.test($piece)) {
             return ' ';
         } else {
             return 'A';

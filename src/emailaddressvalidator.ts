@@ -1,7 +1,6 @@
 //PHP Methods
 //TODO: Replace all PHP methods with native JavaScript
 import preg_replace from "locutus/php/pcre/preg_replace";
-import preg_match from "locutus/php/pcre/preg_match";
 import strrpos from "locutus/php/strings/strrpos";
 import substr from "locutus/php/strings/substr";
 
@@ -17,7 +16,7 @@ export default class EmailAddressValidator {
         //    $strEmailAddress = stripslashes($strEmailAddress);
         //}
         // Control characters are not allowed
-        if (preg_match('[\x00-\x1F\x7F-\xFF]', $strEmailAddress)) {
+        if (/[\x00-\x1F\x7F-\xFF]/.test($strEmailAddress)) {
             return false;
         }
         // Split it into sections using last instance of "@"
@@ -68,14 +67,12 @@ export default class EmailAddressValidator {
         // 3) an obsolete format string (combination of the above)
         const $arrLocalPortion = $strLocalPortion.split('.');
         for (let $i = 0, $max = $arrLocalPortion.length; $i < $max; $i++) {
-            if (!preg_match('^('
+            if (!new RegExp('^('
                 +'([A-Za-z0-9!#$%&\'*+/=?^_`{|}~-]'
                 +'[A-Za-z0-9!#$%&\'*+/=?^_`{|}~-]{0,63})'
                 +'|'
                 +'("[^\\"]{0,62}")'
-                +')$'
-            , $arrLocalPortion[$i])
-            ) {
+                +')$').test($arrLocalPortion[$i])) {
                 return false;
             }
         }
@@ -90,10 +87,10 @@ export default class EmailAddressValidator {
             return false;
         }
         // Check if domain is IP, possibly enclosed in square brackets.
-        if (preg_match('^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
-                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}$', $strDomainPortion) ||
-            preg_match('^\\[(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
-                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}\\]$', $strDomainPortion)) {
+        if (new RegExp('^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
+                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}$').test($strDomainPortion) ||
+            new RegExp('^\\[(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
+                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}\\]$').test($strDomainPortion)) {
             return true;
         } else {
             const $arrDomainPortion = $strDomainPortion.split(".");
@@ -105,9 +102,8 @@ export default class EmailAddressValidator {
                 if (!this.check_text_length($arrDomainPortion[$i], 1, 63)) {
                     return false;
                 }
-                if (!preg_match('^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|'
-                    +'([A-Za-z0-9]+))$', $arrDomainPortion[$i])
-                ) {
+                if (!new RegExp('^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|'
+                    +'([A-Za-z0-9]+))$').test($arrDomainPortion[$i])) {
                     return false;
                 }
             }
