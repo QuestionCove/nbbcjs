@@ -91,13 +91,9 @@ export default class EmailAddressValidator {
         }
         // Check if domain is IP, possibly enclosed in square brackets.
         if (preg_match('^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
-                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}$', 
-        $strDomainPortion) ||
-        //TODO: make sure double escape of backslash on [] is fine
+                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}$', $strDomainPortion) ||
             preg_match('^\\[(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
-                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}\\]$', 
-            $strDomainPortion)
-        ) {
+                +'(.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}\\]$', $strDomainPortion)) {
             return true;
         } else {
             const $arrDomainPortion = $strDomainPortion.split(".");
