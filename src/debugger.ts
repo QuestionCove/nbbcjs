@@ -1,4 +1,3 @@
-import date from "locutus/php/datetime/date";
 import fs from 'fs';
 import { DebugLevel } from "../@types/enums";
 
@@ -9,7 +8,7 @@ export default class Debugger {
     public static log(level: DebugLevel, title: string, string?: any) {
         if (level >= this.level) {
             if (this.log_file) {
-                title = '['+date('Y-m-d H:i:s.u')+'] '+title;
+                title = '['+new Date().toLocaleString()+'] '+title;
                 fs.appendFileSync(this.log_file, title+" "+JSON.stringify(string,null,4)+"\n");
             } else {
                 switch(level) {
