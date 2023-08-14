@@ -2,7 +2,6 @@
 //TODO: Replace all PHP methods with native JavaScript
 import preg_replace from "locutus/php/pcre/preg_replace";
 import strrpos from "locutus/php/strings/strrpos";
-import substr from "locutus/php/strings/substr";
 
 export default class EmailAddressValidator {
     /**
@@ -23,8 +22,8 @@ export default class EmailAddressValidator {
         }
         const arrEmailAddress: string[] = [];
         const arrTempAddress: string[] = [];
-        arrEmailAddress[0] = substr(emailAddress, 0, intAtSymbol);
-        arrEmailAddress[1] = substr(emailAddress, intAtSymbol + 1);
+        arrEmailAddress[0] = emailAddress.slice(0, intAtSymbol);
+        arrEmailAddress[1] = emailAddress.slice(intAtSymbol + 1);
         // Count the "@" symbols. Only one is allowed, except where
         // contained in quote marks in the local part. Quickest way to
         // check this is to remove anything in quotes.

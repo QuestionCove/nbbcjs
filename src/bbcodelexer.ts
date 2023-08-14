@@ -10,7 +10,6 @@ import preg_split, {PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY} from "../modu
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import preg_replace from "locutus/php/pcre/preg_replace";
-import substr from "locutus/php/strings/substr";
 
 export default class BBCodeLexer {
     public token: BBToken;         // Return token type:  One of the BBCODE_* constants.
@@ -135,7 +134,7 @@ export default class BBCodeLexer {
                 state = LexState.TAG;
                 length += text.length;
             } else {
-                switch (substr(this.text, 0, 1).charCodeAt()) {
+                switch (this.text.slice(0, 1).charCodeAt(0)) {
                 case 10:
                 case 13:
                     state = LexState.TEXT;
@@ -202,7 +201,7 @@ export default class BBCodeLexer {
                 } else {
                     // This must be either whitespace, a newline, or a tag.
                     this.state = LexState.TEXT;
-                    switch (substr(this.text, 0, 1).charCodeAt()) {
+                    switch (this.text.slice(0, 1).charCodeAt(0)) {
                     case 10:
                     case 13:
                         // Newline.
@@ -235,7 +234,7 @@ export default class BBCodeLexer {
             } else {
                 let matches;
                 // This must be either whitespace, a newline, or a tag.
-                switch (substr(this.text, 0, 1).charCodeAt()) {
+                switch (this.text.slice(0, 1).charCodeAt(0)) {
                 case 10:
                 case 13:
                     // Newline.
@@ -380,10 +379,10 @@ export default class BBCodeLexer {
      */
     protected stripQuotes(string: string): string {
         if (string.length > 1) {
-            const first = substr(string, 0, 1);
-            const last = substr(string, -1);
+            const first = string.slice(0, 1);
+            const last = string.slice(-1);
             if (first === last && (first === '"' || first === "'")) {
-                return substr(string, 1, -1);
+                return string.slice(1, -1);
             }
         }
         return string;
@@ -429,9 +428,9 @@ export default class BBCodeLexer {
         // Create the initial result object.
         const result: TagType = {'_tag': tag, '_endtag': '', '_name': '', '_hasend': false, '_end': false, '_default': false};
         // Strip off the [brackets] around the tag, leaving just its content.
-        tag = substr(tag, 1, tag.length - 2);
+        tag = tag.slice(1, tag.length - 1);
         // The starting bracket *must* be followed by a non-whitespace character.
-        const ch = substr(tag, 0, 1).charCodeAt();
+        const ch = tag.slice(0, 1).charCodeAt(0);
         if (ch >= 0 && ch <= 32) {
             return result;
         }
@@ -450,8 +449,8 @@ export default class BBCodeLexer {
         }
         // The first piece should be the tag name, whatever it is.  If it starts with a /
         // we remove the / and mark it as an end tag.
-        if (pieces[ptr] && substr(pieces[ptr], 0, 1) === '/') {
-            result['_name'] = substr(pieces[ptr++], 1).toLowerCase();
+        if (pieces[ptr] && pieces[ptr].slice(0, 1) === '/') {
+            result['_name'] = pieces[ptr++].slice(1).toLowerCase();
             result['_end'] = true;
         } else {
             result['_name'] = pieces[ptr++].toLowerCase();
@@ -586,7 +585,7 @@ export default class BBCodeLexer {
             }
             // Record this in the associative array if it's a legal public identifier name.
             // Legal *public* identifier names must *not* begin with an underscore.
-            if (substr(key, 0, 1) !== '_') {
+            if (key.slice(0, 1) !== '_') {
                 result[key] = value;
             }
             // Record this in the parameter list always.

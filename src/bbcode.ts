@@ -29,7 +29,6 @@ import str_replace from 'locutus/php/strings/str_replace';
 import strip_tags from "locutus/php/strings/strip_tags";
 import strpos from "locutus/php/strings/strpos";
 import strrchr from "locutus/php/strings/strrchr";
-import substr from 'locutus/php/strings/substr';
 import trim from 'locutus/php/strings/trim';
 import urlencode from 'locutus/php/url/urlencode';
 
@@ -517,8 +516,8 @@ export default class BBCode {
             return true;
         }
         // Match mail addresses.
-        if (emailToo && substr(string, 0, 7) == "mailto:") {
-            return this.isValidEmail(substr(string, 7));
+        if (emailToo && string.slice(0, 7) == "mailto:") {
+            return this.isValidEmail(string.slice(7));
         }
         return false;
     }
@@ -881,7 +880,7 @@ export default class BBCode {
                 }
                 if (matches[2]) {
                     // We have one or more indexes, so break them apart and look up the requested data.
-                    for (const index of matches[2].substring(1).split(".")) {
+                    for (const index of matches[2].slice(1).split(".")) {
                         if (typeof value == "object") {
                             value = value[index] ? value[index] : null;
                         } else {
