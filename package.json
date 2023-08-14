@@ -14,7 +14,13 @@
     "bbcode",
     "nbbc",
     "extensible",
-    "fast"
+    "fast",
+    "library",
+    "front-end",
+    "back-end",
+    "emoji",
+    "formatting",
+    "html"
   ],
   "engines": {
     "node": ">=16"
