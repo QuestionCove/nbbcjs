@@ -1,7 +1,3 @@
-//PHP Methods
-//TODO: Replace all PHP methods with native JavaScript
-import strrpos from "locutus/php/strings/strrpos";
-
 export default class EmailAddressValidator {
     /**
      * Check email address validity.
@@ -14,8 +10,8 @@ export default class EmailAddressValidator {
             return false;
         }
         // Split it into sections using last instance of "@"
-        const intAtSymbol = strrpos(emailAddress, '@');
-        if (intAtSymbol === false) {
+        const intAtSymbol = emailAddress.lastIndexOf('@');
+        if (intAtSymbol === -1) {
             // No "@" symbol in email.
             return false;
         }
@@ -30,7 +26,7 @@ export default class EmailAddressValidator {
         arrTempAddress[1] = arrEmailAddress[1];
         const strTempAddress = arrTempAddress[0] + arrTempAddress[1];
         // Then check - should be no "@" symbols.
-        if (strrpos(strTempAddress, '@') !== false) {
+        if (strTempAddress.lastIndexOf('@') > -1) {
             // "@" symbol found
             return false;
         }

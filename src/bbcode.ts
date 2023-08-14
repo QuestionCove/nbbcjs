@@ -25,9 +25,6 @@ import preg_quote from "locutus/php/pcre/preg_quote";
 import rtrim from 'locutus/php/strings/rtrim';
 import str_replace from 'locutus/php/strings/str_replace';
 import strip_tags from "locutus/php/strings/strip_tags";
-import strpos from "locutus/php/strings/strpos";
-import strrchr from "locutus/php/strings/strrchr";
-import trim from 'locutus/php/strings/trim';
 
 export default class BBCode {
     /**
@@ -737,7 +734,7 @@ export default class BBCode {
         let isURL = false;
         for (const part of parts) {
             let URLParts;
-            if (strpos(part, ' ') !== false) {
+            if (!part || part.indexOf(' ') > -1) {
                 URLParts = false;
             } else {
                 URLParts = parse_url(part);
@@ -805,11 +802,11 @@ export default class BBCode {
             return true;
         }
         // Only localhost is allowed if there is no TLD.
-        if (strpos(host, '.') === false) {
+        if (host.indexOf('.') === -1) {
             return host === 'localhost';
         }
         // Strip the TLD portion from the string.
-        const TLD: string = trim(strrchr(host, '.'), '.');
+        const TLD: string = host.slice(host.lastIndexOf('.') + 1);
         // Check against the known TLDs.
         // We'll just assume that two letter TLDs are valid to avoid too many checks.
         if (validTLDs.includes(TLD) || /^[a-z]{2}$/.test(TLD)) {
