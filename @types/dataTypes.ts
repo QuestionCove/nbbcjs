@@ -21,14 +21,22 @@ export interface StackType {
 }
 
 export interface TagType {
+    //Parser Types
     _tag?: string,
-    _endtag: boolean | string,
-    _name: string,
+    _endtag?: boolean | string,
+    _name?: string,
     _hasend?: boolean,
     _end?: boolean,
-    _default: boolean | string,
+    _default?: boolean | string | null,
     _params?: Param[],
-    title?: string
+    //Tag Specific Types
+    title?: string | null,
+    url?: string,
+    target?: string,
+    content?: string,
+    email?: string,
+    wikiURL?: string,
+    name?: string,
 }
 
 export interface TagRules {
@@ -223,13 +231,13 @@ export interface Param {
 
 export interface State {
     token: BBToken,
-    text: string | null,
-    tag: TagType | boolean | null,
+    text: string,
+    tag: TagType | boolean,
     state: LexState,
-    input: null,
-    ptr: number | null,
-    unget: boolean | null,
-    verbatim: boolean | null
+    input: string[],
+    ptr: number,
+    unget: boolean,
+    verbatim: boolean
 }
 
 /**

@@ -15,60 +15,60 @@ import substr from "locutus/php/strings/substr";
 import empty from "locutus/php/var/empty";
 
 export default class BBCodeLexer {
-    public $token: BBToken;            // Return token type:  One of the BBCODE_* constants.
-    public $text: string;            // Actual exact, original text of token.
-    public $tag: TagType|boolean;            // If token is a tag, this is the decoded array version.
-    public $state: LexState;            // Next state of the lexer's state machine: text, or tag/ws/nl
-    public $input;            // The input string, split into an array of tokens.
-    public $ptr: number;            // Read pointer into the input array.
-    public $unget: boolean;            // Whether to "unget" the last token.
-    public $verbatim: boolean;        // In verbatim mode, we return all input, unparsed, including comments.
-    public $debug: boolean;            // In debug mode, we dump decoded tags when we find them.
-    public $tagmarker: string;        // Which kind of tag marker we're using:  "[", "<", "(", or "{"
-    public $end_tagmarker: string;    // The ending tag marker:  "]", ">", "(", or "{"
-    public $pat_main: string|RegExp;        // Main tag-matching pattern.
-    public $pat_comment: RegExp;    // Pattern for matching comments.
-    public $pat_comment2: RegExp;    // Pattern for matching comments.
-    public $pat_wiki: RegExp;        // Pattern for matching wiki-links.
+    public token: BBToken;         // Return token type:  One of the BBCODE_* constants.
+    public text: string;           // Actual exact, original text of token.
+    public tag: TagType | boolean;   // If token is a tag, this is the decoded array version.
+    public state: LexState;        // Next state of the lexer's state machine: text, or tag/ws/nl
+    public input: string[];        // The input string, split into an array of tokens.
+    public ptr: number;            // Read pointer into the input array.
+    public unget: boolean;         // Whether to "unget" the last token.
+    public verbatim: boolean;      // In verbatim mode, we return all input, unparsed, including comments.
+    public debug: boolean;         // In debug mode, we dump decoded tags when we find them.
+    public tagMarker: string;      // Which kind of tag marker we're using:  "[", "<", "(", or "{"
+    public endTagMarker: string;   // The ending tag marker:  "]", ">", "(", or "{"
+    public patMain: string | RegExp; // Main tag-matching pattern.
+    public patComment: RegExp;     // Pattern for matching comments.
+    public patComment2: RegExp;    // Pattern for matching comments.
+    public patWiki: RegExp;        // Pattern for matching wiki-links.
     /**
      * Instantiate a new instance of the {@link BBCodeLexer} class.
      *
-     * @param string $string The string to be broken up into tokens.
-     * @param string $tagmarker The BBCode tag marker.
+     * @param string The string to be broken up into tokens.
+     * @param tagMarker The BBCode tag marker.
      */
-    public constructor($string: string, $tagmarker = '[') {
+    public constructor(string: string, tagMarker = '[') {
         // First thing we do is to split the input string into tuples of
         // text and tags.  This will make it easy to tokenize.  We define a tag as
         // anything starting with a [, ending with a ], and containing no [ or ] in
         // between unless surrounded by "" or '', and containing no newlines.
         // We also separate out whitespace and newlines.
         // Choose a tag marker based on the possible tag markers.
-        const $regex_beginmarkers = {
+        const regexBeginMarkers = {
             "[": "\\[",
             "<": "<",
             "{": "\\{",
             "(": "\\("
         };
-        const $regex_endmarkers = {
+        const RegexEndMarkers = {
             "[": "\\]",
             "<": ">",
             "{": "\\}",
             "(": "\\)"
         };
-        const $endmarkers = {
+        const endMarkers = {
             "[": "]",
             "<": ">",
             "{": "}",
             "(": ")"
         };
-        if (!$regex_endmarkers[$tagmarker]) {
-            $tagmarker = '[';
+        if (!RegexEndMarkers[tagMarker]) {
+            tagMarker = '[';
         }
-        const $e = $regex_endmarkers[$tagmarker];
-        const $b = $regex_beginmarkers[$tagmarker];
-        this.$tagmarker = $tagmarker;
-        this.$end_tagmarker = $endmarkers[$tagmarker];
-        // this.$input will be an array of tokens, with the special property that
+        const end = RegexEndMarkers[tagMarker];
+        const start = regexBeginMarkers[tagMarker];
+        this.tagMarker = tagMarker;
+        this.endTagMarker = endMarkers[tagMarker];
+        // this.input will be an array of tokens, with the special property that
         // the elements strictly alternate between plain text and tags/whitespace/newlines,
         // and that tags always have *two* entries per tag. The first element will
         // always be plain text. Note that the regexes below make VERY heavy use of
@@ -76,46 +76,46 @@ export default class BBCodeLexer {
         // know how things like (?!) and (?:) and (?=) work. Unfortanetly the /x modifier
         // doesn't exist here to make this a *lot* more legible and debuggable, so it's
         // been modified to stretch across multiple lines with the comments edited.
-        this.$pat_main = "/("
+        this.patMain = "/("
             // Match tags, as long as they do not start with [-- or [' or [!-- or [rem or [[.
             // Tags may contain "quoted" or 'quoted' sections that may contain [ or ] characters.
             // Tags may not contain newlines.
-            +`${$b}`
-            +`(?!--|'|!--|${$b}${$b})`
-            +`(?:[^\\n\\r${$b}${$e}]|\\"[^\\"\\n\\r]*\\"|\\'[^\\'\\n\\r]*\\')*`
-            +`${$e}`
+            +`${start}`
+            +`(?!--|'|!--|${start}${start})`
+            +`(?:[^\\n\\r${start}${end}]|\\"[^\\"\\n\\r]*\\"|\\'[^\\'\\n\\r]*\\')*`
+            +`${end}`
             // Match wiki-links, which are of the form [[...]] or [[...|...]].  Unlike
             // tags, wiki-links treat " and ' marks as normal input characters; but they
             // still may not contain newlines.
-            +`|${$b}${$b}(?:[^${$e}\\r\\n]|${$e}[^${$e}\\r\\n]){1,256}${$e}${$e}`
+            +`|${start}${start}(?:[^${end}\\r\\n]|${end}[^${end}\\r\\n]){1,256}${end}${end}`
             // Match single-line comments, which start with [-- or [' or [rem .
-            +`|${$b}(?:--|')(?:[^${$e}\\n\\r]*)${$e}`
+            +`|${start}(?:--|')(?:[^${end}\\n\\r]*)${end}`
             // Match multi-line comments, which start with [!-- and end with --] and contain
             // no --] in between.
-            +`|${$b}!--(?:[^-]|-[^-]|--[^${$e}])*--${$e}`
+            +`|${start}!--(?:[^-]|-[^-]|--[^${end}])*--${end}`
             // Match five or more hyphens as a special token, which gets returned as a [rule] tag.
             +"|-----+"
             // Match newlines, in all four possible forms.
             +"|\\x0D\\x0A|\\x0A\\x0D|\\x0D|\\x0A"
             // Match whitespace, but only if it butts up against a newline, rule, or
             // bracket on at least one end.
-            +`|[\\x00-\\x09\\x0B-\\x0C\\x0E-\\x20]+(?=[\\x0D\\x0A${$b}]|-----|$)`
-            +`|(?<=[\\x0D\\x0A${$e}]|-----|^)[\\x00-\\x09\\x0B-\\x0C\\x0E-\\x20]+`
+            +`|[\\x00-\\x09\\x0B-\\x0C\\x0E-\\x20]+(?=[\\x0D\\x0A${start}]|-----|$)`
+            +`|(?<=[\\x0D\\x0A${end}]|-----|^)[\\x00-\\x09\\x0B-\\x0C\\x0E-\\x20]+`
             +")/Dx";
-        this.$input = preg_split(this.$pat_main, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+        this.input = preg_split(this.patMain, string, -1, PREG_SPLIT_DELIM_CAPTURE);
         // Patterns for matching specific types of tokens during lexing. (originally contained Dx flags)
-        this.$pat_comment = new RegExp(`^${$b}(?:--|')`);
-        this.$pat_comment2 = new RegExp(`^${$b}!--(?:[^-]|-[^-]|--[^${$e}])*--${$e}$`);
-        this.$pat_wiki = new RegExp(`^${$b}${$b}([^\\|]*)(?:\\|(.*))?${$e}${$e}$`);
+        this.patComment = new RegExp(`^${start}(?:--|')`);
+        this.patComment2 = new RegExp(`^${start}!--(?:[^-]|-[^-]|--[^${end}])*--${end}$`);
+        this.patWiki = new RegExp(`^${start}${start}([^\\|]*)(?:\\|(.*))?${end}${end}$`);
         // Current lexing state.
-        this.$ptr = 0;
-        this.$unget = false;
-        this.$state = LexState.TEXT;
-        this.$verbatim = false;
+        this.ptr = 0;
+        this.unget = false;
+        this.state = LexState.TEXT;
+        this.verbatim = false;
         // Return values.
-        this.$token = BBToken.EOI;
-        this.$tag = false;
-        this.$text = "";
+        this.token = BBToken.EOI;
+        this.tag = false;
+        this.text = "";
     }
     /**
      * Compute how many non-tag characters there are in the input, give or take a few.
@@ -124,47 +124,47 @@ export default class BBCodeLexer {
      * horizontal rules and weird whitespace characters wrong, but it's only supposed
      * to provide a rough quick guess, not a hard fact.
      *
-     * @return int Returns the approximate text length.
+     * @return Returns the approximate text length.
      */
     public guessTextLength(): number {
-        let $length = 0;
-        let $ptr = 0;
-        let $state = LexState.TEXT;
+        let length = 0;
+        let ptr = 0;
+        let state = LexState.TEXT;
         // Loop until we find a valid (nonempty) token.
-        while ($ptr < this.$input.length) {
-            const $text = this.$input[$ptr++];
-            if ($state == LexState.TEXT) {
-                $state = LexState.TAG;
-                $length += $text.length;
+        while (ptr < this.input.length) {
+            const text = this.input[ptr++];
+            if (state == LexState.TEXT) {
+                state = LexState.TAG;
+                length += text.length;
             } else {
-                switch (ord(substr(this.$text, 0, 1))) {
+                switch (ord(substr(this.text, 0, 1))) {
                 case 10:
                 case 13:
-                    $state = LexState.TEXT;
-                    $length++;
+                    state = LexState.TEXT;
+                    length++;
                     break;
                 default:
-                    $state = LexState.TEXT;
-                    $length += $text.length;
+                    state = LexState.TEXT;
+                    length += text.length;
                     break;
                 case 40:
                 case 60:
                 case 91:
                 case 123:
-                    $state = LexState.TEXT;
+                    state = LexState.TEXT;
                     break;
                 }
             }
         }
-        return $length;
+        return length;
     }
     /**
      * Return the type of the next token, either BBCODE_TAG or BBCODE_TEXT or BBCODE_EOI.
      *
-     * This stores the content of this token into this.$text, the type of this token in this.$token, and possibly an
-     * array into this.$tag.
+     * This stores the content of this token into this.text, the type of this token in this.token, and possibly an
+     * array into this.tag.
      *
-     * If this is a BBCODE_TAG token, this.$tag will be an array computed from the tag's contents, like this:
+     * If this is a BBCODE_TAG token, this.tag will be an array computed from the tag's contents, like this:
      *
      * ```
      * [
@@ -179,40 +179,40 @@ export default class BBCodeLexer {
      */
     public nextToken(): BBToken {
         // Handle ungets; if the last token has been "ungotten", just return it again.
-        if (this.$unget) {
-            this.$unget = false;
-            return this.$token;
+        if (this.unget) {
+            this.unget = false;
+            return this.token;
         }
         // Loop until we find a valid (nonempty) token.
         while (true) {
             // Did we run out of tokens in the input?
-            if (this.$ptr >= this.$input.length) {
-                this.$text = "";
-                this.$tag = false;
-                return this.$token = BBToken.EOI;
+            if (this.ptr >= this.input.length) {
+                this.text = "";
+                this.tag = false;
+                return this.token = BBToken.EOI;
             }
             // Inhale one token, sanitizing away any weird control characters.  We
             // allow \t, \r, and \n to pass through, but that's it.
-            this.$text = preg_replace("/[\\x00-\\x08\\x0B-\\x0C\\x0E-\\x1F]/", "", this.$input[this.$ptr++]);
-            if (this.$verbatim) {
+            this.text = preg_replace("/[\\x00-\\x08\\x0B-\\x0C\\x0E-\\x1F]/", "", this.input[this.ptr++]);
+            if (this.verbatim) {
                 // In verbatim mode, we return *everything* as plain text or whitespace.
-                this.$tag = false;
-                let $token_type;
-                if (this.$state == LexState.TEXT) {
-                    this.$state = LexState.TAG;
-                    $token_type = BBToken.TEXT;
+                this.tag = false;
+                let tokenType: BBToken;
+                if (this.state == LexState.TEXT) {
+                    this.state = LexState.TAG;
+                    tokenType = BBToken.TEXT;
                 } else {
                     // This must be either whitespace, a newline, or a tag.
-                    this.$state = LexState.TEXT;
-                    switch (ord(substr(this.$text, 0, 1))) {
+                    this.state = LexState.TEXT;
+                    switch (ord(substr(this.text, 0, 1))) {
                     case 10:
                     case 13:
                         // Newline.
-                        $token_type = BBToken.NL;
+                        tokenType = BBToken.NL;
                         break;
                     default:
                         // Whitespace.
-                        $token_type = BBToken.WS;
+                        tokenType = BBToken.WS;
                         break;
                     case 45:
                     case 40:
@@ -220,54 +220,54 @@ export default class BBCodeLexer {
                     case 91:
                     case 123:
                         // Tag or comment.
-                        $token_type = BBToken.TEXT;
+                        tokenType = BBToken.TEXT;
                         break;
                     }
                 }
-                if (this.$text.length > 0) {
-                    return this.$token = $token_type;
+                if (this.text.length > 0) {
+                    return this.token = tokenType;
                 }
-            } else if (this.$state == LexState.TEXT) {
+            } else if (this.state == LexState.TEXT) {
                 // Next up is plain text, but only return it if it's nonempty.
-                this.$state = LexState.TAG;
-                this.$tag = false;
-                if (this.$text.length > 0) {
-                    return this.$token = BBToken.TEXT;
+                this.state = LexState.TAG;
+                this.tag = false;
+                if (this.text.length > 0) {
+                    return this.token = BBToken.TEXT;
                 }
             } else {
-                let $matches;
+                let matches;
                 // This must be either whitespace, a newline, or a tag.
-                switch (ord(substr(this.$text, 0, 1))) {
+                switch (ord(substr(this.text, 0, 1))) {
                 case 10:
                 case 13:
                     // Newline.
-                    this.$tag = false;
-                    this.$state = LexState.TEXT;
-                    return this.$token = BBToken.NL;
+                    this.tag = false;
+                    this.state = LexState.TEXT;
+                    return this.token = BBToken.NL;
                 case 45:
                     // A rule made of hyphens; return it as a [rule] tag.
-                    if (/^-----/.test(this.$text)) {
-                        this.$tag = {
+                    if (/^-----/.test(this.text)) {
+                        this.tag = {
                             "_name": "rule",
                             "_endtag": false,
                             "_default": ""
                         };
-                        this.$state = LexState.TEXT;
-                        return this.$token = BBToken.TAG;
+                        this.state = LexState.TEXT;
+                        return this.token = BBToken.TAG;
                     } else {
-                        this.$tag = false;
-                        this.$state = LexState.TEXT;
-                        if (this.$text.length > 0) {
-                            return this.$token = BBToken.TEXT;
+                        this.tag = false;
+                        this.state = LexState.TEXT;
+                        if (this.text.length > 0) {
+                            return this.token = BBToken.TEXT;
                         }
                         break;
                     }
                     break;
                 default:
                     // Whitespace.
-                    this.$tag = false;
-                    this.$state = LexState.TEXT;
-                    return this.$token = BBToken.WS;
+                    this.tag = false;
+                    this.state = LexState.TEXT;
+                    return this.token = BBToken.WS;
                 case 40:
                 case 60:
                 case 91:
@@ -275,32 +275,32 @@ export default class BBCodeLexer {
                     // Tag or comment.  This is the most complicated one, because it
                     // needs to be parsed into its component pieces.
                     // See if this is a comment; if so, skip it.
-                    if (this.$pat_comment.test(this.$text)) {
+                    if (this.patComment.test(this.text)) {
                         // This is a comment, not a tag, so treat it like it doesn't exist.
-                        this.$state = LexState.TEXT;
+                        this.state = LexState.TEXT;
                         break;
                     }
-                    if (this.$pat_comment2.test(this.$text)) {
+                    if (this.patComment2.test(this.text)) {
                         // This is a comment, not a tag, so treat it like it doesn't exist.
-                        this.$state = LexState.TEXT;
+                        this.state = LexState.TEXT;
                         break;
                     }
                     // See if this is a [[wiki link]]; if so, convert it into a [wiki="" title=""] tag.
-                    if (($matches = this.$text.match(this.$pat_wiki))) {
-                        $matches = {...{1: null, 2: null}, ...$matches};
-                        this.$tag = {
+                    if ((matches = this.text.match(this.patWiki))) {
+                        matches = {...{1: null, 2: null}, ...matches};
+                        this.tag = {
                             '_name': 'wiki',
                             '_endtag': false,
-                            '_default': $matches[1], 
-                            'title': $matches[2]
+                            '_default': matches[1], 
+                            'title': matches[2]
                         };
-                        this.$state = LexState.TEXT;
-                        return this.$token = BBToken.TAG;
+                        this.state = LexState.TEXT;
+                        return this.token = BBToken.TAG;
                     }
                     // Not a comment, so parse it like a tag.
-                    this.$tag = this.decodeTag(this.$text);
-                    this.$state = LexState.TEXT;
-                    return this.$token = (this.$tag['_end'] ? BBToken.ENDTAG : BBToken.TAG);
+                    this.tag = this.decodeTag(this.text);
+                    this.state = LexState.TEXT;
+                    return this.token = (this.tag['_end'] ? BBToken.ENDTAG : BBToken.TAG);
                 }
             }
         }
@@ -313,19 +313,19 @@ export default class BBCodeLexer {
      * a BBCODE_TAG --- exactly what you ungot, not a BBCODE_TEXT token.
      */
     public ungetToken() {
-        if (this.$token !== BBToken.EOI) {
-            this.$unget = true;
+        if (this.token !== BBToken.EOI) {
+            this.unget = true;
         }
     }
     /**
      * Peek at the next token, but don't remove it.
      */
     public peekToken() {
-        const $result = this.nextToken();
-        if (this.$token !== BBToken.EOI) {
-            this.$unget = true;
+        const result = this.nextToken();
+        if (this.token !== BBToken.EOI) {
+            this.unget = true;
         }
-        return $result;
+        return result;
     }
     /**
      * Save the state of this lexer so it can be restored later.
@@ -336,26 +336,26 @@ export default class BBCodeLexer {
      */
     public saveState(): State {
         return {
-            'token': this.$token,
-            'text': this.$text,
-            'tag': this.$tag,
-            'state': this.$state,
-            'input': this.$input,
-            'ptr': this.$ptr,
-            'unget': this.$unget,
-            'verbatim': this.$verbatim
+            'token': this.token,
+            'text': this.text,
+            'tag': this.tag,
+            'state': this.state,
+            'input': this.input,
+            'ptr': this.ptr,
+            'unget': this.unget,
+            'verbatim': this.verbatim
         };
     }
     /**
      * Restore the state of this lexer from a saved previous state.
      *
-     * @param array $state The previous lexer state.
+     * @param lexState The previous lexer state.
      */
-    public restoreState($state: State) {
-        if (!(typeof $state == "object")) {
+    public restoreState(lexState: State) {
+        if (!(typeof lexState == "object")) {
             return;
         }
-        $state = {...{
+        lexState = {...{
             'token': null,
             'text': null,
             'tag': null,
@@ -364,31 +364,31 @@ export default class BBCodeLexer {
             'ptr': null,
             'unget': null,
             'verbatim': null
-        }, ...$state};
-        this.$token = $state['token'];
-        this.$text = $state['text'];
-        this.$tag = $state['tag'];
-        this.$state = $state['state'];
-        this.$input = $state['input'];
-        this.$ptr = $state['ptr'];
-        this.$unget = $state['unget'];
-        this.$verbatim = $state['verbatim'];
+        }, ...lexState};
+        this.token = lexState['token'];
+        this.text = lexState['text'];
+        this.tag = lexState['tag'];
+        this.state = lexState['state'];
+        this.input = lexState['input'];
+        this.ptr = lexState['ptr'];
+        this.unget = lexState['unget'];
+        this.verbatim = lexState['verbatim'];
     }
     /**
      * Given a string, if it's surrounded by "quotes" or 'quotes', remove them.
      *
-     * @param string $string The string to strip.
-     * @return string Returns the string stripped of quotes.
+     * @param string The string to strip.
+     * @return Returns the string stripped of quotes.
      */
-    protected stripQuotes($string) {
-        if ($string.length > 1) {
-            const $first = substr($string, 0, 1);
-            const $last = substr($string, -1);
-            if ($first === $last && ($first === '"' || $first === "'")) {
-                return substr($string, 1, -1);
+    protected stripQuotes(string: string): string {
+        if (string.length > 1) {
+            const first = substr(string, 0, 1);
+            const last = substr(string, -1);
+            if (first === last && (first === '"' || first === "'")) {
+                return substr(string, 1, -1);
             }
         }
-        return $string;
+        return string;
     }
     /**
      * Given a tokenized piece of a tag, decide what type of token it is.
@@ -401,20 +401,20 @@ export default class BBCodeLexer {
      * - '"'   Token is quoted text.
      * - 'A'   Token is unquoted text.
      *
-     * @param int $ptr The index of {@link $pieces} to examine.
-     * @param array $pieces The pieces array to classify.
-     * @return string Returns the tokenized piece of the tag.
+     * @param ptr The index of {@link pieces} to examine.
+     * @param pieces The pieces array to classify.
+     * @return Returns the tokenized piece of the tag.
      */
-    protected classifyPiece($ptr: number, $pieces) {
-        if ($ptr >= $pieces.length) {
+    protected classifyPiece(ptr: number, pieces: string[]) {
+        if (ptr >= pieces.length) {
             return -1; // EOI.
         }
-        const $piece = $pieces[$ptr];
-        if ($piece == '=') {
+        const piece = pieces[ptr];
+        if (piece == '=') {
             return '=';
-        } else if (/^['"]/.test($piece)) {
+        } else if (/^['"]/.test(piece)) {
             return '"';
-        } else if (/^[\x00-\x20]+$/.test($piece)) {
+        } else if (/^[\x00-\x20]+$/.test(piece)) {
             return ' ';
         } else {
             return 'A';
@@ -423,62 +423,62 @@ export default class BBCodeLexer {
     /**
      * Given a string containing a complete [tag] (including its brackets), break it down into its components and return them as an array.
      *
-     * @param $tag The tag to decode.
+     * @param tag The tag to decode.
      * @return Returns the object representation of the tag.
      */
-    protected decodeTag($tag: string): TagType {
-        Debugger.debug("Lexer.InternalDecodeTag: input:", $tag);
+    protected decodeTag(tag: string): TagType {
+        Debugger.debug("Lexer.InternalDecodeTag: input:", tag);
         // Create the initial result object.
-        const $result = {'_tag': $tag, '_endtag': '', '_name': '', '_hasend': false, '_end': false, '_default': false};
+        const result: TagType = {'_tag': tag, '_endtag': '', '_name': '', '_hasend': false, '_end': false, '_default': false};
         // Strip off the [brackets] around the tag, leaving just its content.
-        $tag = substr($tag, 1, $tag.length - 2);
+        tag = substr(tag, 1, tag.length - 2);
         // The starting bracket *must* be followed by a non-whitespace character.
-        const $ch = ord(substr($tag, 0, 1));
-        if ($ch >= 0 && $ch <= 32) {
-            return $result;
+        const ch = ord(substr(tag, 0, 1));
+        if (ch >= 0 && ch <= 32) {
+            return result;
         }
         // Break it apart into words, quoted text, whitespace, and equal signs.
-        const $pieces = preg_split(
+        const pieces = preg_split(
             "/(\\\"[^\\\"]+\\\"|\\'[^\\']+\\'|=|[\\x00-\\x20]+)/",
-            $tag,
+            tag,
             -1,
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
         );
-        let $ptr = 0;
-        let $type;
+        let ptr = 0;
+        let type;
         // Handle malformed (empty) tags correctly.
-        if ($pieces.length < 1) {
-            return $result;
+        if (pieces.length < 1) {
+            return result;
         }
         // The first piece should be the tag name, whatever it is.  If it starts with a /
         // we remove the / and mark it as an end tag.
-        if (!empty($pieces[$ptr]) && substr($pieces[$ptr], 0, 1) === '/') {
-            $result['_name'] = substr($pieces[$ptr++], 1).toLowerCase();
-            $result['_end'] = true;
+        if (!empty(pieces[ptr]) && substr(pieces[ptr], 0, 1) === '/') {
+            result['_name'] = substr(pieces[ptr++], 1).toLowerCase();
+            result['_end'] = true;
         } else {
-            $result['_name'] = $pieces[$ptr++].toLowerCase();
-            $result['_end'] = false;
+            result['_name'] = pieces[ptr++].toLowerCase();
+            result['_end'] = false;
         }
         // Skip whitespace after the tag name.
-        while (($type = this.classifyPiece($ptr, $pieces)) == ' ') {
-            $ptr++;
+        while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+            ptr++;
         }
-        const $params: Param[] = [];
-        let $value;
+        const params: Param[] = [];
+        let value;
         // If the next piece is an equal sign, then the tag's default value follows.
-        if ($type != '=') {
-            $result['_default'] = false;
-            $params.push({'key': '', 'value': ''});
+        if (type != '=') {
+            result['_default'] = false;
+            params.push({'key': '', 'value': ''});
         } else {
-            $ptr++;
+            ptr++;
             // Skip whitespace after the initial equal-sign.
-            while (($type = this.classifyPiece($ptr, $pieces)) == ' ') {
-                $ptr++;
+            while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+                ptr++;
             }
             // Examine the next (real) piece, and see if it's quoted; if not, we need to
             // use heuristics to guess where the default value begins and ends.
-            if ($type == "\"") {
-                $value = this.stripQuotes($pieces[$ptr++]);
+            if (type == "\"") {
+                value = this.stripQuotes(pieces[ptr++]);
             } else {
                 // Collect pieces going forward until we reach an = sign or the end of the
                 // tag; then rewind before whatever comes before the = sign, and everything
@@ -488,117 +488,117 @@ export default class BBCodeLexer {
                 // any equal-signs before whitespace are considered to be part of the parameter
                 // as well; this allows an ugly tag like [url=http://foo?bar=baz target=my_window]
                 // to behave in a way that makes (tolerable) sense.
-                let $after_space = false;
-                let $start = $ptr;
-                while (($type = this.classifyPiece($ptr, $pieces)) != -1) {
-                    if ($type == ' ') {
-                        $after_space = true;
+                let afterSpace = false;
+                let start = ptr;
+                while ((type = this.classifyPiece(ptr, pieces)) != -1) {
+                    if (type == ' ') {
+                        afterSpace = true;
                     }
-                    if ($type == '=' && $after_space) {
+                    if (type == '=' && afterSpace) {
                         break;
                     }
-                    $ptr++;
+                    ptr++;
                 }
-                if ($type == -1) {
-                    $ptr--;
+                if (type == -1) {
+                    ptr--;
                 }
                 // We've now found the first (appropriate) equal-sign after the start of the
                 // default value.  (In the example above, that's the "=" after "target"+)  We
                 // now have to rewind back to the last whitespace to find where the default
                 // value ended.
-                if ($type == '=') {
+                if (type == '=') {
                     // Rewind before = sign.
-                    $ptr--;
+                    ptr--;
                     // Rewind before any whitespace before = sign.
-                    while ($ptr > $start && this.classifyPiece($ptr, $pieces) == ' ') {
-                        $ptr--;
+                    while (ptr > start && this.classifyPiece(ptr, pieces) == ' ') {
+                        ptr--;
                     }
                     // Rewind before any text elements before that.
-                    while ($ptr > $start && this.classifyPiece($ptr, $pieces) != ' ') {
-                        $ptr--;
+                    while (ptr > start && this.classifyPiece(ptr, pieces) != ' ') {
+                        ptr--;
                     }
                 }
-                // The default value is everything from $start to $ptr, inclusive.
-                $value = "";
-                for (; $start <= $ptr; $start++) {
-                    if (this.classifyPiece($start, $pieces) == ' ') {
-                        $value += " ";
+                // The default value is everything from `start` to `ptr`, inclusive.
+                value = "";
+                for (; start <= ptr; start++) {
+                    if (this.classifyPiece(start, pieces) == ' ') {
+                        value += " ";
                     } else {
-                        $value += this.stripQuotes($pieces[$start]);
+                        value += this.stripQuotes(pieces[start]);
                     }
                 }
-                $value = $value.trim();
-                $ptr++;
+                value = value.trim();
+                ptr++;
             }
-            $result['_default'] = $value;
-            $params.push({'key': '', 'value': $value});
+            result['_default'] = value;
+            params.push({'key': '', 'value': value});
         }
         // The rest of the tag is composed of either floating keys or key=value pairs, so walk through
         // the tag and collect them all.  Again, we have the nasty special case where an equal sign
         // in a parameter but before whitespace counts as part of that parameter.
-        while (($type = this.classifyPiece($ptr, $pieces)) != -1) {
-            let $key;
+        while ((type = this.classifyPiece(ptr, pieces)) != -1) {
+            let key = '';
             // Skip whitespace before the next key name.
-            while ($type === ' ') {
-                $ptr++;
-                $type = this.classifyPiece($ptr, $pieces);
+            while (type === ' ') {
+                ptr++;
+                type = this.classifyPiece(ptr, pieces);
             }
             // Decode the key name.
-            if ($type === 'A' || $type === '"') {
-                if ($pieces[$ptr]) {
-                    $key = this.stripQuotes($pieces[$ptr].toLowerCase());
+            if (type === 'A' || type === '"') {
+                if (pieces[ptr]) {
+                    key = this.stripQuotes(pieces[ptr].toLowerCase());
                 } else {
-                    $key = '';
+                    key = '';
                 }
-                $ptr++;
-            } else if ($type === '=') {
-                $ptr++;
+                ptr++;
+            } else if (type === '=') {
+                ptr++;
                 continue;
-            } else if ($type === -1) {
+            } else if (type === -1) {
                 break;
             }
             // Skip whitespace after the key name.
-            while (($type = this.classifyPiece($ptr, $pieces)) == ' ') {
-                $ptr++;
+            while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+                ptr++;
             }
             // If an equal-sign follows, we need to collect a value.  Otherwise, we
             // take the key itself as the value.
-            if ($type !== '=') {
-                $value = this.stripQuotes($key);
+            if (type !== '=') {
+                value = this.stripQuotes(key);
             } else {
-                $ptr++;
+                ptr++;
                 // Skip whitespace after the equal sign.
-                while (($type = this.classifyPiece($ptr, $pieces)) == ' ') {
-                    $ptr++;
+                while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+                    ptr++;
                 }
-                if ($type === '"') {
+                if (type === '"') {
                     // If we get a quoted value, take that as the only value.
-                    $value = this.stripQuotes($pieces[$ptr++]);
-                } else if ($type !== -1) {
+                    value = this.stripQuotes(pieces[ptr++]);
+                } else if (type !== -1) {
                     // If we get a non-quoted value, consume non-quoted values
                     // until we reach whitespace.
-                    $value = $pieces[$ptr++];
-                    while (($type = this.classifyPiece($ptr, $pieces)) != -1
-                        && $type != ' ') {
-                        $value += $pieces[$ptr++];
+                    value = pieces[ptr++];
+                    while ((type = this.classifyPiece(ptr, pieces)) != -1
+                        && type != ' ') {
+                        value += pieces[ptr++];
                     }
                 } else {
-                    $value = "";
+                    value = "";
                 }
             }
             // Record this in the associative array if it's a legal public identifier name.
             // Legal *public* identifier names must *not* begin with an underscore.
-            if (substr($key, 0, 1) !== '_') {
-                $result[$key] = $value;
+            if (substr(key, 0, 1) !== '_') {
+                result[key] = value;
             }
             // Record this in the parameter list always.
-            $params.push({'key': $key, 'value': $value});
+            params.push({'key': key, 'value': value});
         }
         // Add the parameter list as a member of the associative array.
-        $result['_params'] = $params;
+        result['_params'] = params;
         // In debugging modes, output the tag as we collected it.
-        Debugger.debug("Lexer.InternalDecodeTag: output:", $result);
+        Debugger.debug("Lexer.InternalDecodeTag: output:", result);
         // Save the resulting parameters, and return the whole shebang.
-        return $result;
+        return result;
     }
 }

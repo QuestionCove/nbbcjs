@@ -16,7 +16,7 @@ export default function preg_split(
 
     const parsedpattern = pattern.replace(/\/([^/]*$)/, "").replace(/\//,'');
     //const patternflags = pattern.match(/\/([^/]*$)/)[1].toLowerCase();
-    let split = [];
+    let split: string[] = [];
     if (subject)
         split = subject.split(RegExp(parsedpattern, ""));
 

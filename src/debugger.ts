@@ -6,7 +6,7 @@ export default class Debugger {
     public static level: DebugLevel = DebugLevel.warn;
     public static log_file: undefined | string;
     // File to log messages to
-    public static log(level: DebugLevel, title: string, string?) {
+    public static log(level: DebugLevel, title: string, string?: any) {
         if (level >= this.level) {
             if (this.log_file) {
                 title = '['+date('Y-m-d H:i:s.u')+'] '+title;
@@ -48,16 +48,16 @@ export default class Debugger {
             }
         }
     }
-    public static debug(title: string, string?) {
+    public static debug(title: string, string?: any) {
         this.log(DebugLevel.debug, title, string);
     }
-    public static info(title: string, string?) {
+    public static info(title: string, string?: any) {
         this.log(DebugLevel.info, title, string);
     }
-    public static warn(title: string, string?) {
+    public static warn(title: string, string?: any) {
         this.log(DebugLevel.warn, title, string);
     }
-    public static error(title: string, string?) {
+    public static error(title: string, string?: any) {
         this.log(DebugLevel.error, title, string);
     }
 }

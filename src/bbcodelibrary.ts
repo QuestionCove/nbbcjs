@@ -19,9 +19,9 @@ import basename from "locutus/php/filesystem/basename";
 
 export default class BBCodeLibrary {
     /**
-     * @var array Standard library of smiley definitions.
+     * @var defaultEmoji Standard library of smiley definitions.
      */
-    public $default_smileys = {
+    public defaultEmoji: Record<string, string> = {
         ":)": "smile.gif",
         ":-)": "smile.gif",
         "=)": "smile.gif",
@@ -123,9 +123,9 @@ export default class BBCodeLibrary {
         ":star:": "star.gif"
     };
     /**
-     * @var Record {@link TagRules} Standard rules for what to do when a BBCode tag is encountered.
+     * @var defaultTagRules {@link TagRules} Standard rules for what to do when a BBCode tag is encountered.
      */
-    public $default_tag_rules: Record<string, TagRules> = {
+    public defaultTagRules: Record<string, TagRules> = {
         "b": {
             "simple_start": "<b>",
             "simple_end": "</b>",
@@ -419,46 +419,46 @@ export default class BBCodeLibrary {
     /**
      * @var array The file extensions that are considered valid local images.
      */
-    protected $imageExtensions = ['gif', 'jpg', 'jpeg', 'png', 'svg'];
+    protected imageExtensions = ['gif', 'jpg', 'jpeg', 'png', 'svg'];
     /**
      * Format a [url] tag by producing an <a>...</a> element.
      *
      * The URL only allows http, https, mailto, and ftp protocols for safety.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return string Returns the full HTML url.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns the full HTML url.
      */
-    public doURL($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string) {
+    public doURL(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | true {
         // We can't check this with BBCODE_CHECK because we may have no URL
         // before the content has been processed.
-        if ($action == BBAction.CHECK) {
+        if (action == BBAction.CHECK) {
             return true;
         }
-        let $target = '';
-        const $url = typeof $default == "string"
-            ? $default
-            : $bbcode.unHTMLEncode(strip_tags($content));
-        if ($bbcode.isValidURL($url)) {
-            if ($bbcode.$debug) {
+        let target = '';
+        const url = typeof defaultValue == "string"
+            ? defaultValue
+            : bbcode.unHTMLEncode(strip_tags(content));
+        if (bbcode.isValidURL(url)) {
+            if (bbcode.debug) {
                 Debugger.debug('ISVALIDURL', '');
             }
-            if ($bbcode.getURLTargetable() !== false && $params['target']) {
-                $target = ' target="'+htmlspecialchars($params['target'])+'"';
+            if (bbcode.getURLTargetable() !== false && params['target']) {
+                target = ' target="'+htmlspecialchars(params['target'])+'"';
             }
-            if ($bbcode.getURLTarget() !== false && empty($target)) {
-                $target = ' target="'+htmlspecialchars($bbcode.getURLTarget())+'"';
+            if (bbcode.getURLTarget() !== false && empty(target)) {
+                target = ' target="'+htmlspecialchars(bbcode.getURLTarget())+'"';
             }
-            // If $detect_urls is on, it's possble the $content is already
+            // If `detectURLs` is on, it's possble the content is already
             // enclosed in an <a href> tag. Remove that if that is the case.
-            $content = preg_replace('/^\\<a [^\\>]*\\>(.*?)<\\/a>$/', "\\1", $content);
-            return $bbcode.fillTemplate($bbcode.getURLTemplate(), {"url": $url, "target": $target, "content": $content});
+            content = preg_replace('/^\\<a [^\\>]*\\>(.*?)<\\/a>$/', "\\1", content);
+            return bbcode.fillTemplate(bbcode.getURLTemplate(), {"url": url, "target": target, "content": content});
         } else {
-            return htmlspecialchars($params['_tag'])+$content+htmlspecialchars($params['_endtag']);
+            return htmlspecialchars(params['_tag'])+content+htmlspecialchars(params['_endtag']);
         }
     }
     /**
@@ -467,77 +467,77 @@ export default class BBCodeLibrary {
      * The e-mail address must be a valid address including at least a '@' and a valid domain
      * name or IPv4 or IPv6 address after the '@'.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return string Returns the email link HTML.
      */
-    public doEmail($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string) {
+    public doEmail(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | true {
         // We can't check this with BBCODE_CHECK because we may have no URL
         // before the content has been processed.
-        if ($action == BBAction.CHECK) {
+        if (action == BBAction.CHECK) {
             return true;
         }
-        const $email = typeof $default == "string"
-            ? $default
-            : $bbcode.unHTMLEncode(strip_tags($content));
-        if ($bbcode.isValidEmail($email)) {
-            return $bbcode.fillTemplate($bbcode.getEmailTemplate(), {"email": $email, "content": $content});
+        const email = typeof defaultValue == "string"
+            ? defaultValue
+            : bbcode.unHTMLEncode(strip_tags(content));
+        if (bbcode.isValidEmail(email)) {
+            return bbcode.fillTemplate(bbcode.getEmailTemplate(), {"email": email, "content": content});
         } else {
-            return htmlspecialchars($params['_tag'])+$content+htmlspecialchars($params['_endtag']);
+            return htmlspecialchars(params['_tag'])+content+htmlspecialchars(params['_endtag']);
         }
     }
     /**
      * Format a [size] tag by producing a <span> with a style with a different font-size.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return string Returns a span with the font size CSS.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns a span with the font size CSS.
      */
-    public doSize($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string) {
-        let $size;
-        switch ($default) {
+    public doSize(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string {
+        let size: any;
+        switch (defaultValue) {
         case '0':
-            $size = '.5em';
+            size = '.5em';
             break;
         case '1':
-            $size = '.67em';
+            size = '.67em';
             break;
         case '2':
-            $size = '.83em';
+            size = '.83em';
             break;
         case '3':
-            $size = '1.0em';
+            size = '1.0em';
             break;
         case '4':
-            $size = '1.17em';
+            size = '1.17em';
             break;
         case '5':
-            $size = '1.5em';
+            size = '1.5em';
             break;
         case '6':
-            $size = '2.0em';
+            size = '2.0em';
             break;
         case '7':
-            $size = '2.5em';
+            size = '2.5em';
             break;
         default:
-            $size = parseInt($default);
-            if ($size < 11 || $size > 48) {
-                $size = '1.0em';
+            size = parseInt(defaultValue);
+            if (size < 11 || size > 48) {
+                size = '1.0em';
             } else {
-                $size += 'px';
+                size += 'px';
             }
             break;
         }
-        return '<span style="font-size:'+$size+'">'+$content+'</span>';
+        return '<span style="font-size:'+size+'">'+content+'</span>';
     }
     /**
      * Format a [font] tag by producing a <span> with a style with a different font-family.
@@ -545,18 +545,18 @@ export default class BBCodeLibrary {
      * This is complicated by the fact that we have to recognize the five special font
      * names and quote all the others.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return string Returns a span with the font family CSS.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns a span with the font family CSS.
      */
-    public doFont($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string) {
-        const $fonts = $default.split(',');
-        let $result = "";
-        const $special_fonts = {
+    public doFont(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string {
+        const fonts = defaultValue.split(',');
+        let result = "";
+        const specialFonts: Record<string, string> = {
             "serif": "serif",
             "sans-serif": "sans-serif",
             "sans serif": "sans-serif",
@@ -567,104 +567,104 @@ export default class BBCodeLibrary {
             "monospace": "monospace",
             "mono": "monospace"
         };
-        for (let $font of $fonts) {
-            $font = $font.trim();
-            if ($special_fonts[$font]) {
-                if ($result.length > 0) {
-                    $result += ",";
+        for (let font of fonts) {
+            font = font.trim();
+            if (specialFonts[font]) {
+                if (result.length > 0) {
+                    result += ",";
                 }
-                $result += $special_fonts[$font];
-            } else if ($font.length > 0) {
-                if ($result.length > 0) {
-                    $result += ",";
+                result += specialFonts[font];
+            } else if (font.length > 0) {
+                if (result.length > 0) {
+                    result += ",";
                 }
-                $result += `'${$font}'`;
+                result += `'${font}'`;
             }
         }
-        return `<span style="font-family:${$result}">${$content}</span>`;
+        return `<span style="font-family:${result}">${content}</span>`;
     }
     /**
      * Format a [wiki] tag by producing an <a>...</a> element.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return string Returns a link to the wiki.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns a link to the wiki.
      */
-    public doWiki($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string) {
-        let $title;
-        $name = $bbcode.wikify($default);
-        if ($action == BBAction.CHECK) {
-            return $name.length > 0;
+    public doWiki(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | boolean {
+        let title;
+        name = bbcode.wikify(defaultValue);
+        if (action == BBAction.CHECK) {
+            return name.length > 0;
         }
-        if ($params['title'] && $params['title'].length) {
-            $title = $params['title'].trim();
+        if (params['title'] && params['title'].length) {
+            title = params['title'].trim();
         } else {
-            $title = $default.trim();
+            title = defaultValue.trim();
         }
-        const $wikiURL = $bbcode.getWikiURL();
-        return $bbcode.fillTemplate($bbcode.getWikiURLTemplate(), {wikiURL: $wikiURL, name: $name, title: $title});
+        const wikiURL = bbcode.getWikiURL();
+        return bbcode.fillTemplate(bbcode.getWikiURLTemplate(), {wikiURL: wikiURL, name: name, title: title});
     }
     /**
      * Format an [img] tag.  The URL only allows http, https, and ftp protocols for safety.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return string Returns the image tag.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns the image tag.
      */
-    public doImage($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string) {
+    public doImage(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | true {
         // We can't validate this until we have its content.
-        if ($action == BBAction.CHECK) {
+        if (action == BBAction.CHECK) {
             return true;
         }
-        $content = $bbcode.unHTMLEncode(strip_tags($content)).trim();
-        if (empty($content) && $default) {
-            $content = $default;
+        content = bbcode.unHTMLEncode(strip_tags(content)).trim();
+        if (empty(content) && defaultValue) {
+            content = defaultValue;
         }
-        const $urlParts = parse_url($content) as Record<string, string>;
-        if (typeof $urlParts == "object") {
-            if ($urlParts['path'] &&
-               !$urlParts['scheme'] &&
-               !/^.{0,2}\//.test($urlParts['path']) &&
-               in_array(pathinfo($urlParts['path'], 'PATHINFO_EXTENSION'), this.$imageExtensions)
+        const urlParts = parse_url(content) as Record<string, string>;
+        if (typeof urlParts == "object") {
+            if (urlParts['path'] &&
+               !urlParts['scheme'] &&
+               !/^.{0,2}\//.test(urlParts['path']) &&
+               in_array(pathinfo(urlParts['path'], 'PATHINFO_EXTENSION'), this.imageExtensions)
             ) {
-                const $localImgURL = $bbcode.getLocalImgURL();
+                const localImgURL = bbcode.getLocalImgURL();
                 return "<img src=\""
-                +htmlspecialchars((empty($localImgURL) ? '' : $localImgURL+'/')+ltrim($urlParts['path'], '/'))+'" alt="'
-                +htmlspecialchars(basename($content))+'" class="bbcode_img" />';
-            } else if ($bbcode.isValidURL($content, false)) {
+                +htmlspecialchars((empty(localImgURL) ? '' : localImgURL+'/')+ltrim(urlParts['path'], '/'))+'" alt="'
+                +htmlspecialchars(basename(content))+'" class="bbcode_img" />';
+            } else if (bbcode.isValidURL(content, false)) {
                 // Remote URL, or at least we don't know where it is.
-                return '<img src="'+htmlspecialchars($content)+'" alt="'
-                +htmlspecialchars(basename($content))+'" class="bbcode_img" />';
+                return '<img src="'+htmlspecialchars(content)+'" alt="'
+                +htmlspecialchars(basename(content))+'" class="bbcode_img" />';
             }
         }
-        return htmlspecialchars($params['_tag'])+htmlspecialchars($content)+htmlspecialchars($params['_endtag']);
+        return htmlspecialchars(params['_tag'])+htmlspecialchars(content)+htmlspecialchars(params['_endtag']);
     }
     /**
      * Format a [rule] tag.
      *
      * This substitutes the content provided by the BBCode object, whatever that may be.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return bool|string Returns the rule HTML or **true** if {@link $action} is **BBAction.BBCODE_CHECK**.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns the rule HTML or **true** if {@link action} is **BBAction.BBCODE_CHECK**.
      */
-    public doRule($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string): boolean | string {
-        if ($action == BBAction.CHECK) {
+    public doRule(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): boolean | string {
+        if (action == BBAction.CHECK) {
             return true;
         } else {
-            return $bbcode.getRuleHTML();
+            return bbcode.getRuleHTML();
         }
     }
     /**
@@ -688,37 +688,37 @@ export default class BBCodeLibrary {
      *
      * The URL only allows http, https, mailto, gopher, ftp, and feed protocols for safety.
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return bool|string Returns the quote HTML or **true** if {@link $action} is **BBAction.BBCODE_CHECK**.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns the quote HTML or **true** if {@link action} is **BBAction.BBCODE_CHECK**.
      */
-    public doQuote($bbcode: BBCode, $action: BBAction, $name: string, $default: string, $params: boolean | TagType, $content: string): boolean | string {
-        if ($action == BBAction.CHECK) {
+    public doQuote(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): boolean | string {
+        if (action == BBAction.CHECK) {
             return true;
         }
-        let $title;
-        if ($params['name']) {
-            $title = htmlspecialchars($params['name'].trim())+" wrote";
-            if ($params['date']) {
-                $title += " on "+htmlspecialchars($params['date'].trim());
+        let title;
+        if (params['name']) {
+            title = htmlspecialchars(params['name'].trim())+" wrote";
+            if (params['date']) {
+                title += " on "+htmlspecialchars(params['date'].trim());
             }
-            $title += ":";
-            if ($params['url']) {
-                const $url = $params['url'].trim();
-                if ($bbcode.isValidURL($url)) {
-                    $title = "<a href=\""+htmlspecialchars($params['url'])+"\">"+$title+"</a>";
+            title += ":";
+            if (params['url']) {
+                const URL = params['url'].trim();
+                if (bbcode.isValidURL(URL)) {
+                    title = "<a href=\""+htmlspecialchars(params['url'])+"\">"+title+"</a>";
                 }
             }
-        } else if (typeof $default !== "string") {
-            $title = "Quote:";
+        } else if (typeof defaultValue !== "string") {
+            title = "Quote:";
         } else {
-            $title = htmlspecialchars($default.trim())+" wrote:";
+            title = htmlspecialchars(defaultValue.trim())+" wrote:";
         }
-        return $bbcode.fillTemplate($bbcode.getQuoteTemplate(), {"title": $title, "content": $content});
+        return bbcode.fillTemplate(bbcode.getQuoteTemplate(), {"title": title, "content": content});
     }
     /**
      * Format a [list] tag.
@@ -741,18 +741,18 @@ export default class BBCodeLibrary {
      * [list=01]        Ordered list, two-digit numeric with 0-padding, starting at 01
      * ```
      *
-     * @param $bbcode: BBCode The {@link BBCode} object doing the parsing.
-     * @param $action The current action being performed on the tag.
-     * @param $name The name of the tag.
-     * @param $default The default value passed to the tag in the form: `[tag=default]`.
-     * @param $params All of the parameters passed to the tag.
-     * @param $content The content of the tag. Only available when {@link $action} is {@link BBAction.OUTPUT}.
-     * @return string|bool Returns the list HTML or a boolen result when {@link $action} is **BBAction.BBCODE_CHECK**.
+     * @param bbcode: BBCode The {@link BBCode} object doing the parsing.
+     * @param action The current action being performed on the tag.
+     * @param name The name of the tag.
+     * @param defaultValue The default value passed to the tag in the form: `[tag=default]`.
+     * @param params All of the parameters passed to the tag.
+     * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
+     * @return Returns the list HTML or a boolen result when {@link action} is **BBAction.BBCODE_CHECK**.
      */
-    public doList($bbcode: BBCode, $action: BBAction, $name: string, $default: string|null, $params: boolean | TagType, $content: string): boolean | string {
+    public doList(bbcode: BBCode, action: BBAction, name: string, defaultValue: string|null, params: boolean | TagType, content: string): boolean | string {
         // Allowed list styles, striaght from the CSS 2.1 spec.  The only prohibited
         // list style is that with image-based markers, which often slows down web sites.
-        const $listStyles = {
+        const listStyles: Record<string, string> = {
             "1": "decimal",
             "01": "decimal-leading-zero",
             "i": "lower-roman",
@@ -760,7 +760,7 @@ export default class BBCodeLibrary {
             "a": "lower-alpha",
             "A": "upper-alpha"
         };
-        const $ciListStyles = {
+        const ciListStyles: Record<string, string> = {
             "circle": "circle",
             "disc": "disc",
             "square": "square",
@@ -768,49 +768,52 @@ export default class BBCodeLibrary {
             "armenian": "armenian",
             "georgian": "georgian"
         };
-        const $ulTypes = {
+        const ulTypes: Record<string, string> = {
             "circle": "circle",
             "disc": "disc",
             "square": "square"
         };
-        $default = $default ? $default.trim() : null;
-        if ($action == BBAction.CHECK) {
-            if (!(typeof $default == "string")) {
+        defaultValue = defaultValue ? defaultValue.trim() : null;
+        if (action == BBAction.CHECK) {
+            if (!(typeof defaultValue == "string")) {
                 return true;
-            } else if ($listStyles[$default]) {
+            } else if (listStyles[defaultValue]) {
                 return true;
-            } else if ($ciListStyles[$default.toLowerCase()]) {
+            } else if (ciListStyles[defaultValue.toLowerCase()]) {
                 return true;
             } else {
                 return false;
             }
         }
         // Choose a list element (<ul> or <ol>) and a style.
-        let $elem, $type;
-        if (!(typeof $default == "string")) {
-            $elem = 'ul';
-            $type = '';
-        } else if ($default == '1') {
-            $elem = 'ol';
-            $type = '';
-        } else if ($listStyles[$default]) {
-            $elem = 'ol';
-            $type = $listStyles[$default];
+        let elem: string, type: string;
+        if (!(typeof defaultValue == "string")) {
+            elem = 'ul';
+            type = '';
+        } else if (defaultValue == '1') {
+            elem = 'ol';
+            type = '';
+        } else if (listStyles[defaultValue]) {
+            elem = 'ol';
+            type = listStyles[defaultValue];
         } else {
-            $default = $default.toLowerCase();
-            if ($ulTypes[$default]) {
-                $elem = 'ul';
-                $type = $ulTypes[$default];
-            } else if ($ciListStyles[$default]) {
-                $elem = 'ol';
-                $type = $ciListStyles[$default];
+            defaultValue = defaultValue.toLowerCase();
+            if (ulTypes[defaultValue]) {
+                elem = 'ul';
+                type = ulTypes[defaultValue];
+            } else if (ciListStyles[defaultValue]) {
+                elem = 'ol';
+                type = ciListStyles[defaultValue];
+            } else {
+                elem = 'ul';
+                type = '';
             }
         }
         // Generate the HTML for it.
-        if ($type.length) {
-            return `\n<${$elem} class="bbcode_list" style="list-style-type:${$type}">\n${$content}</${$elem}>\n`;
+        if (type.length > 0) {
+            return `\n<${elem} class="bbcode_list" style="list-style-type:${type}">\n${content}</${elem}>\n`;
         } else {
-            return `\n<${$elem} class="bbcode_list">\n${$content}</${$elem}>\n`;
+            return `\n<${elem} class="bbcode_list">\n${content}</${elem}>\n`;
         }
     }
 }
