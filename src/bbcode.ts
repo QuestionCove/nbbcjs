@@ -22,14 +22,12 @@ import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
 import parse_url from 'locutus/php/url/parse_url';
 import preg_quote from "locutus/php/pcre/preg_quote";
-import rawurlencode from 'locutus/php/url/rawurlencode';
 import rtrim from 'locutus/php/strings/rtrim';
 import str_replace from 'locutus/php/strings/str_replace';
 import strip_tags from "locutus/php/strings/strip_tags";
 import strpos from "locutus/php/strings/strpos";
 import strrchr from "locutus/php/strings/strrchr";
 import trim from 'locutus/php/strings/trim';
-import urlencode from 'locutus/php/url/urlencode';
 
 export default class BBCode {
     /**
@@ -480,7 +478,7 @@ export default class BBCode {
     // "Washington_D.C+", safe to pass through a URL or anywhere else.  All characters
     // in the extended-character range (0x7F-0xFF) will be URL-encoded.
     public wikify(string: string): string {
-        return rawurlencode(str_replace(" ", "_", trim(string.replace(/[!?;@#$%^&*<>=+`~\x00-\x20_-]+/g, " "))));
+        return encodeURIComponent(str_replace(" ", "_", string.replace(/[!?;@#$%^&*<>=+`~\x00-\x20_-]+/g, " ").trim()));
     }
     /**
      * Returns true if the given string is a valid URL.
@@ -928,7 +926,7 @@ export default class BBCode {
                     } else if (flags['h']) {
                         value = htmlspecialchars(value);
                     } else if (flags['u']) {
-                        value = urlencode(value);
+                        value = encodeURIComponent(value);
                     }
                     if (flags['n']) {
                         value = this.nl2br(value);

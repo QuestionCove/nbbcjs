@@ -581,7 +581,7 @@ const tests = {
         {
             descr: "The [[wiki]] special tag does not convert [a-zA-Z0-9'\".:_-].",
             bbcode: 'This is a test of the [["Ab1cd\'Ef2gh_Ij3kl.,Mn4op:Qr9st-Uv0wx"]] tag.',
-            html: 'This is a test of the <a href="/?page=%22Ab1cd%27Ef2gh_Ij3kl.%2CMn4op%3AQr9st_Uv0wx%22" class="bbcode_wiki">&quot;Ab1cd\'Ef2gh_Ij3kl.,Mn4op:Qr9st-Uv0wx&quot;</a> tag.',
+            html: 'This is a test of the <a href="/?page=%22Ab1cd\'Ef2gh_Ij3kl.%2CMn4op%3AQr9st_Uv0wx%22" class="bbcode_wiki">&quot;Ab1cd\'Ef2gh_Ij3kl.,Mn4op:Qr9st-Uv0wx&quot;</a> tag.',
         },
         {
             descr: "The [[wiki]] special tag can contain spaces.",
