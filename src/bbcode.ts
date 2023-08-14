@@ -20,7 +20,6 @@ import basename from "locutus/php/filesystem/basename";
 import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
 import parse_url from 'locutus/php/url/parse_url';
-import rtrim from 'locutus/php/strings/rtrim';
 import str_replace from 'locutus/php/strings/str_replace';
 import strip_tags from "locutus/php/strings/strip_tags";
 
@@ -356,7 +355,7 @@ export default class BBCode {
         return "img";
     }
     public setLocalImgURL(path: string) {
-        this.localImgUrl = rtrim(path, '/');
+        this.localImgUrl = path.replace(/\/+$/, '');
         return this;
     }
     public getLocalImgURL() {

@@ -8,7 +8,6 @@ import { TagRules, TagType } from "../@types/dataTypes";
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import parse_url from "locutus/php/url/parse_url";
-import ltrim from "locutus/php/strings/ltrim";
 import htmlspecialchars from "locutus/php/strings/htmlspecialchars";
 import strip_tags from "locutus/php/strings/strip_tags";
 import pathinfo from "locutus/php/filesystem/pathinfo";
@@ -634,7 +633,7 @@ export default class BBCodeLibrary {
             ) {
                 const localImgURL = bbcode.getLocalImgURL();
                 return "<img src=\""
-                +htmlspecialchars((!localImgURL ? '' : localImgURL+'/')+ltrim(urlParts['path'], '/'))+'" alt="'
+                +htmlspecialchars((!localImgURL ? '' : localImgURL+'/')+urlParts['path'].replace(/\/+/, ''))+'" alt="'
                 +htmlspecialchars(basename(content))+'" class="bbcode_img" />';
             } else if (bbcode.isValidURL(content, false)) {
                 // Remote URL, or at least we don't know where it is.
