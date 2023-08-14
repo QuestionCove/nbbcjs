@@ -41,12 +41,12 @@ const tests = {
         {
             descr: "Broken [ tags before [b]real tags[/b] don't break the real tags.",
             bbcode: "Broken [ tags before [b]real tags[/b] don't break the real tags.",
-            html: "Broken [ tags before <b>real tags</b> don't break the real tags.",
+            html: "Broken [ tags before <b>real tags</b> don&apos;t break the real tags.",
         },
         {
             descr: "Broken [tags before [b]real tags[/b] don't break the real tags.",
             bbcode: "Broken [tags before [b]real tags[/b] don't break the real tags.",
-            html: "Broken [tags before <b>real tags</b> don't break the real tags.",
+            html: "Broken [tags before <b>real tags</b> don&apos;t break the real tags.",
         },
         {
             descr: "[i][b]Mis-ordered nesting[/i][/b] gets fixed.",
@@ -96,9 +96,9 @@ const tests = {
     ],
     "Special-Character Tests": [
         {
-            descr: '& and < and > and " get replaced with HTML-safe equivalents.',
+            descr: '& and < and > and " and \' get replaced with HTML-safe equivalents.',
             bbcode: "This <woo!> &\"yeah!\" 'sizzle'",
-            html: "This &lt;woo!&gt; &amp;&quot;yeah!&quot; 'sizzle'",
+            html: "This &lt;woo!&gt; &amp;&quot;yeah!&quot; &apos;sizzle&apos;",
         },
         {
             descr: ":-) produces a smiley <img> element.",
@@ -163,7 +163,7 @@ const tests = {
         {
             descr: "['] comments may *not* contain newlines.",
             bbcode: "This is a test of the [' emergency\n\rbroadcasting] system.",
-            html: "This is a test of the [' emergency<br>\nbroadcasting] system.",
+            html: "This is a test of the [&apos; emergency<br>\nbroadcasting] system.",
         },
         {
             descr: "[!-- --] produces a comment.",
@@ -357,7 +357,7 @@ const tests = {
         {
             descr: "[spoiler] gets converted.",
             bbcode: "Ssh, don't tell, but [spoiler]Darth is Luke's father[/spoiler]!",
-            html: "Ssh, don't tell, but <span class=\"bbcode_spoiler\">Darth is Luke's father</span>!",
+            html: "Ssh, don&apos;t tell, but <span class=\"bbcode_spoiler\">Darth is Luke&apos;s father</span>!",
         },
         {
             descr: "[acronym] gets converted.",
@@ -581,7 +581,7 @@ const tests = {
         {
             descr: "The [[wiki]] special tag does not convert [a-zA-Z0-9'\".:_-].",
             bbcode: 'This is a test of the [["Ab1cd\'Ef2gh_Ij3kl.,Mn4op:Qr9st-Uv0wx"]] tag.',
-            html: 'This is a test of the <a href="/?page=%22Ab1cd\'Ef2gh_Ij3kl.%2CMn4op%3AQr9st_Uv0wx%22" class="bbcode_wiki">&quot;Ab1cd\'Ef2gh_Ij3kl.,Mn4op:Qr9st-Uv0wx&quot;</a> tag.',
+            html: 'This is a test of the <a href="/?page=%22Ab1cd\'Ef2gh_Ij3kl.%2CMn4op%3AQr9st_Uv0wx%22" class="bbcode_wiki">&quot;Ab1cd&apos;Ef2gh_Ij3kl.,Mn4op:Qr9st-Uv0wx&quot;</a> tag.',
         },
         {
             descr: "The [[wiki]] special tag can contain spaces.",
@@ -613,22 +613,22 @@ const tests = {
         {
             descr: "[img] produces an image.",
             bbcode: "This is Google's logo: [img]http://www.google.com/intl/en_ALL/images/logo.gif[/img].",
-            html: 'This is Google\'s logo: <img src="http://www.google.com/intl/en_ALL/images/logo.gif" alt="logo.gif" class="bbcode_img" />.',
+            html: 'This is Google&apos;s logo: <img src="http://www.google.com/intl/en_ALL/images/logo.gif" alt="logo.gif" class="bbcode_img" />.',
         },
         {
             descr: "[img] disallows a javascript: URL.",
             bbcode: "This is Google's logo: [img]javascript:alert()[/img].",
-            html: "This is Google's logo: [img]javascript:alert()[/img].",
+            html: "This is Google&apos;s logo: [img]javascript:alert()[/img].",
         },
         {
             descr: "[img] disallows a URL with an unknown protocol type.",
             bbcode: "This is Google's logo: [img]foobar:bar.jpg[/img].",
-            html: "This is Google's logo: [img]foobar:bar.jpg[/img].",
+            html: "This is Google&apos;s logo: [img]foobar:bar.jpg[/img].",
         },
         {
             descr: "[img] disallows HTML content.",
             bbcode: "This is Google's logo: [img]<a href='javascript:alert(\"foo\")'>click me</a>[/img].",
-            html: "This is Google's logo: [img]&lt;a href='javascript:alert(&quot;foo&quot;)'&gt;click me&lt;/a&gt;[/img].",
+            html: "This is Google&apos;s logo: [img]&lt;a href=&apos;javascript:alert(&quot;foo&quot;)&apos;&gt;click me&lt;/a&gt;[/img].",
         },
         {
             descr: "[img] can produce a local image.",
@@ -680,12 +680,12 @@ const tests = {
         {
             descr: "[code]...[/code] should reproduce its contents exactly as they're given.",
             bbcode: "Not code.[code]A [b]and[/b] & <woo>!\n\tAnd a ['hey'] and a [/nonny] and a ho ho ho![/code]Also not code.",
-            html: 'Not code.\n<div class="bbcode_code">\n<div class="bbcode_code_head">Code:</div>\n<div class="bbcode_code_body" style="white-space:pre">A [b]and[/b] &amp; &lt;woo&gt;!\n\tAnd a [\'hey\'] and a [/nonny] and a ho ho ho!</div>\n</div>\nAlso not code.',
+            html: 'Not code.\n<div class="bbcode_code">\n<div class="bbcode_code_head">Code:</div>\n<div class="bbcode_code_body" style="white-space:pre">A [b]and[/b] &amp; &lt;woo&gt;!\n\tAnd a [&apos;hey&apos;] and a [/nonny] and a ho ho ho!</div>\n</div>\nAlso not code.',
         },
         {
             descr: "[code]...[/code] should reproduce PHP source code undamaged.",
             bbcode: "Not code.\n[code]\n$foo['bar'] = 42;\nif ($foo[\"bar\"] < 42) $foo[] = 0;\n[/code]\nAlso not code.\n",
-            html: 'Not code.\n<div class="bbcode_code">\n<div class="bbcode_code_head">Code:</div>\n<div class="bbcode_code_body" style="white-space:pre">$foo[\'bar\'] = 42;\nif ($foo[&quot;bar&quot;] &lt; 42) $foo[] = 0;</div>\n</div>\nAlso not code.<br>\n',
+            html: 'Not code.\n<div class="bbcode_code">\n<div class="bbcode_code_head">Code:</div>\n<div class="bbcode_code_body" style="white-space:pre">$foo[&apos;bar&apos;] = 42;\nif ($foo[&quot;bar&quot;] &lt; 42) $foo[] = 0;</div>\n</div>\nAlso not code.<br>\n',
         },
         {
             descr: "<code>...</code> should not misbehave in '<' tag marker mode.",
@@ -741,7 +741,7 @@ const tests = {
         {
             descr: "[nextcol] doesn't do anything outside a [columns] block.",
             bbcode: "Here's some text.[nextcol]\nHere's some more.\n",
-            html: "Here's some text.[nextcol]<br>\nHere's some more.<br>\n",
+            html: "Here&apos;s some text.[nextcol]<br>\nHere&apos;s some more.<br>\n",
         },
         {
             descr: "Bad column misuse doesn't break layouts.",

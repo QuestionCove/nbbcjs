@@ -5,10 +5,12 @@ import Debugger from "./debugger";
 import { BBMode, BBType, BBAction } from '../@types/enums';
 import { TagRules, TagType } from "../@types/dataTypes";
 
+//Imports
+import { htmlEncode } from '../modules/html_entities';
+
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import parse_url from "locutus/php/url/parse_url";
-import htmlspecialchars from "locutus/php/strings/htmlspecialchars";
 import strip_tags from "locutus/php/strings/strip_tags";
 import pathinfo from "locutus/php/filesystem/pathinfo";
 import basename from "locutus/php/filesystem/basename";
@@ -444,17 +446,17 @@ export default class BBCodeLibrary {
                 Debugger.debug('ISVALIDURL', '');
             }
             if (bbcode.getURLTargetable() !== false && params['target']) {
-                target = ' target="'+htmlspecialchars(params['target'])+'"';
+                target = ' target="'+htmlEncode(params['target'])+'"';
             }
             if (bbcode.getURLTarget() !== false && !target) {
-                target = ' target="'+htmlspecialchars(bbcode.getURLTarget())+'"';
+                target = ' target="'+htmlEncode(bbcode.getURLTarget() as string)+'"';
             }
             // If `detectURLs` is on, it's possble the content is already
             // enclosed in an <a href> tag. Remove that if that is the case.
             content = content.replace(/^<a [^>]*>(.*?)<\/a>$/g, "$1");
             return bbcode.fillTemplate(bbcode.getURLTemplate(), {"url": url, "target": target, "content": content});
         } else {
-            return htmlspecialchars(params['_tag'])+content+htmlspecialchars(params['_endtag']);
+            return htmlEncode(params['_tag'])+content+htmlEncode(params['_endtag']);
         }
     }
     /**
@@ -483,7 +485,7 @@ export default class BBCodeLibrary {
         if (bbcode.isValidEmail(email)) {
             return bbcode.fillTemplate(bbcode.getEmailTemplate(), {"email": email, "content": content});
         } else {
-            return htmlspecialchars(params['_tag'])+content+htmlspecialchars(params['_endtag']);
+            return htmlEncode(params['_tag'])+content+htmlEncode(params['_endtag']);
         }
     }
     /**
@@ -633,15 +635,15 @@ export default class BBCodeLibrary {
             ) {
                 const localImgURL = bbcode.getLocalImgURL();
                 return "<img src=\""
-                +htmlspecialchars((!localImgURL ? '' : localImgURL+'/')+urlParts['path'].replace(/\/+/, ''))+'" alt="'
-                +htmlspecialchars(basename(content))+'" class="bbcode_img" />';
+                +htmlEncode((!localImgURL ? '' : localImgURL+'/')+urlParts['path'].replace(/\/+/, ''))+'" alt="'
+                +htmlEncode(basename(content))+'" class="bbcode_img" />';
             } else if (bbcode.isValidURL(content, false)) {
                 // Remote URL, or at least we don't know where it is.
-                return '<img src="'+htmlspecialchars(content)+'" alt="'
-                +htmlspecialchars(basename(content))+'" class="bbcode_img" />';
+                return '<img src="'+htmlEncode(content)+'" alt="'
+                +htmlEncode(basename(content))+'" class="bbcode_img" />';
             }
         }
-        return htmlspecialchars(params['_tag'])+htmlspecialchars(content)+htmlspecialchars(params['_endtag']);
+        return htmlEncode(params['_tag'])+htmlEncode(content)+htmlEncode(params['_endtag']);
     }
     /**
      * Format a [rule] tag.
@@ -698,21 +700,21 @@ export default class BBCodeLibrary {
         }
         let title;
         if (params['name']) {
-            title = htmlspecialchars(params['name'].trim())+" wrote";
+            title = htmlEncode(params['name'].trim())+" wrote";
             if (params['date']) {
-                title += " on "+htmlspecialchars(params['date'].trim());
+                title += " on "+htmlEncode(params['date'].trim());
             }
             title += ":";
             if (params['url']) {
                 const URL = params['url'].trim();
                 if (bbcode.isValidURL(URL)) {
-                    title = "<a href=\""+htmlspecialchars(params['url'])+"\">"+title+"</a>";
+                    title = "<a href=\""+htmlEncode(params['url'])+"\">"+title+"</a>";
                 }
             }
         } else if (typeof defaultValue !== "string") {
             title = "Quote:";
         } else {
-            title = htmlspecialchars(defaultValue.trim())+" wrote:";
+            title = htmlEncode(defaultValue.trim())+" wrote:";
         }
         return bbcode.fillTemplate(bbcode.getQuoteTemplate(), {"title": title, "content": content});
     }

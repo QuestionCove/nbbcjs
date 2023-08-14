@@ -9,6 +9,7 @@ import {version} from '../package.json';
 import preg_split, { PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY } from "../modules/preg_split";
 import filter_var from "../modules/filter_var";
 import method_exists from "../modules/method_exists";
+import { htmlEncode, htmlDecode } from '../modules/html_entities';
 
 //Types
 import { BBStack, BBToken, BBMode, BBType, BBAction, DebugLevel } from '../@types/enums';
@@ -17,8 +18,6 @@ import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTy
 //PHP Methods
 //TODO: Replace all PHP methods with native JavaScript
 import basename from "locutus/php/filesystem/basename";
-import html_entity_decode from 'locutus/php/strings/html_entity_decode';
-import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
 import parse_url from 'locutus/php/url/parse_url';
 import str_replace from 'locutus/php/strings/str_replace';
 import strip_tags from "locutus/php/strings/strip_tags";
@@ -41,7 +40,7 @@ export default class BBCode {
     protected rootClass: ClassType;        // The root container class.
     protected lostStartTags: Record<string, number>;     // For repair when tags are badly mis-nested.
     protected startTags;         // An associative array of locations of start tags on the stack.
-    protected allowAmpersand: boolean;     // If true, we use str_replace() instead of htmlspecialchars().
+    protected allowAmpersand: boolean;     // If true, we use str_replace() instead of htmlEncode().
     protected tagMarker: string;           // Set to '[', '<', '{', or '('.
     protected ignoreNewlines;              // If true, newlines will be treated as normal whitespace.
     protected plainMode: boolean;          // Don't output tags:  Just output text/whitespace/newlines only.
@@ -459,11 +458,9 @@ export default class BBCode {
     public nl2br(string: string): string {
         return string.replace(/\x0A|\x0D|\x0A\x0D|\x0D\x0A/g, "<br>\n");
     }
-    // This function comes straight from the PHP documentation on html_entity_decode,
-    // and performs exactly the same function.  Unlike html_entity_decode, it
-    // works on older versions of PHP (prior to 4.3.0).
+    // This function comes straight from the html-entities package
     public unHTMLEncode(string: string): string {
-        return html_entity_decode(string);
+        return htmlDecode(string);
     }
     // This takes an arbitrary string and makes it a wiki-safe string:  It converts
     // all characters to be within [a-zA-Z0-9'",.:_-] by converting everything else to
@@ -526,14 +523,14 @@ export default class BBCode {
     /**
      * Escape HTML characters.
      *
-     * This function is used to wrap around calls to htmlspecialchars() for
+     * This function is used to wrap around calls to htmlEncode() for
      * plain text so that you can add your own text-evaluation code if you want.
      * For example, you might want to make *foo* turn into <b>foo</b>, or
-     * something like that.  The default behavior is just to call htmlspecialchars()
+     * something like that.  The default behavior is just to call htmlEncode()
      * and be done with it, but if you inherit and override this function, you
      * can do pretty much anything you want.
      *
-     * Note that htmlspecialchars() is still used directly for doing things like
+     * Note that htmlEncode() is still used directly for doing things like
      * cleaning up URLs in tags; this function is applied to *plain* *text* *only*.
      *
      * @param string The string to replace.
@@ -542,7 +539,7 @@ export default class BBCode {
     public htmlEncode(string: string): string {
         if (this.escapeContent) {
             if (!this.allowAmpersand) {
-                return htmlspecialchars(string);
+                return htmlEncode(string);
             } else {
                 return str_replace(['<', '>', '"'], ['&lt;', '&gt;', '&quot;'], string);
             }
@@ -628,12 +625,12 @@ export default class BBCode {
                 let emojiCount = 0;
                 for (const token of tokens) {
                     if (!isEmoji) {
-                        // For non-smiley text, we just pass it through htmlspecialchars.
+                        // For non-smiley text, we just pass it through htmlEncode.
                         output += this.htmlEncode(token);
                     } else {
-                        const alt = htmlspecialchars(token);
+                        const alt = htmlEncode(token);
                         if (emojiCount < this.maxSmileys || this.maxSmileys < 0) {
-                            output += "<img src=\""+htmlspecialchars(this.emojiUrl+'/'+this.emoji[token])+'"'
+                            output += "<img src=\""+htmlEncode(this.emojiUrl+'/'+this.emoji[token])+'"'
                                 +` alt="${alt}" title="${alt}" class="bbcode_smiley" />`;
                         } else {
                             output += token;
@@ -833,7 +830,7 @@ export default class BBCode {
      *       control codes and tabs, to be collapsed into individual space characters.
      *
      *   e - Apply HTMLEncode().
-     *   h - Apply htmlspecialchars().
+     *   h - Apply htmlEncode().
      *   k - Apply Wikify().
      *   u - Apply urlencode().
      *
@@ -917,7 +914,7 @@ export default class BBCode {
                     } else if (flags.includes('k')) {
                         value = this.wikify(value);
                     } else if (flags.includes('h')) {
-                        value = htmlspecialchars(value);
+                        value = htmlEncode(value);
                     } else if (flags.includes('u')) {
                         value = encodeURIComponent(value);
                     }
@@ -1388,11 +1385,11 @@ export default class BBCode {
     //   `tagName` is the name of the tag being processed.
     //
     //   `defaultValue` is the default value given; for example, in [url=foo], it's "foo"+
-    //        This value has NOT been passed through htmlspecialchars().
+    //        This value has NOT been passed through htmlEncode().
     //
     //   `params` is an array of key: value parameters associated with the tag; for example,
     //        in [smiley src=smile alt=:-)], it's `['src': "smile", 'alt': ":-)"]`.
-    //        These keys and values have NOT beel passed through htmlspecialchars().
+    //        These keys and values have NOT beel passed through htmlEncode().
     //
     //   `contents` is the body of the tag during BBCODE_OUTPUT.  For example, in
     //        [b]Hello[/b], it's "Hello"+  THIS VALUE IS ALWAYS HTML, not BBCode.
@@ -1519,14 +1516,14 @@ export default class BBCode {
                         break;
                     }
                     if (params[possibleContent] && params[possibleContent].length > 0) {
-                        result = htmlspecialchars(params[possibleContent]);
+                        result = htmlEncode(params[possibleContent]);
                         break;
                     }
                 }
                 if (this.debug) {
                     let contentList = "";
                     for (const possibleContent of plainContent)
-                        contentList += htmlspecialchars(possibleContent)+",";
+                        contentList += htmlEncode(possibleContent)+",";
                     if (this.debug)
                         Debugger.debug("DoTag:", `plain-mode tag; possible contents were (${contentList}); using "${possibleContent}"`);
                 }
@@ -1753,7 +1750,7 @@ export default class BBCode {
             this.textLength += this.lexer.text.length;
             this.stack.push({
                 [BBStack.TOKEN]: tokenType,
-                [BBStack.TEXT]: htmlspecialchars(this.lexer.text),
+                [BBStack.TEXT]: htmlEncode(this.lexer.text),
                 [BBStack.TAG]: this.lexer.tag,
                 [BBStack.CLASS]: this.currentClass,
             });
@@ -1814,7 +1811,7 @@ export default class BBCode {
         }
         // Found the end tag, so process this tag immediately with
         // the contents collected between them.  Note that we do NOT
-        // pass the contents through htmlspecialchars or FixupOutput
+        // pass the contents through htmlEncode or FixupOutput
         // or anything else that could sanitize it:  They asked for
         // verbatim contents, so they're going to get it.
         tagParams['_endtag'] = endTagParams;
