@@ -10,7 +10,6 @@ import preg_split, {PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY} from "../modu
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import preg_replace from "locutus/php/pcre/preg_replace";
-import ord from "locutus/php/strings/ord";
 import substr from "locutus/php/strings/substr";
 
 export default class BBCodeLexer {
@@ -136,7 +135,7 @@ export default class BBCodeLexer {
                 state = LexState.TAG;
                 length += text.length;
             } else {
-                switch (ord(substr(this.text, 0, 1))) {
+                switch (substr(this.text, 0, 1).charCodeAt()) {
                 case 10:
                 case 13:
                     state = LexState.TEXT;
@@ -203,7 +202,7 @@ export default class BBCodeLexer {
                 } else {
                     // This must be either whitespace, a newline, or a tag.
                     this.state = LexState.TEXT;
-                    switch (ord(substr(this.text, 0, 1))) {
+                    switch (substr(this.text, 0, 1).charCodeAt()) {
                     case 10:
                     case 13:
                         // Newline.
@@ -236,7 +235,7 @@ export default class BBCodeLexer {
             } else {
                 let matches;
                 // This must be either whitespace, a newline, or a tag.
-                switch (ord(substr(this.text, 0, 1))) {
+                switch (substr(this.text, 0, 1).charCodeAt()) {
                 case 10:
                 case 13:
                     // Newline.
@@ -432,7 +431,7 @@ export default class BBCodeLexer {
         // Strip off the [brackets] around the tag, leaving just its content.
         tag = substr(tag, 1, tag.length - 2);
         // The starting bracket *must* be followed by a non-whitespace character.
-        const ch = ord(substr(tag, 0, 1));
+        const ch = substr(tag, 0, 1).charCodeAt();
         if (ch >= 0 && ch <= 32) {
             return result;
         }
