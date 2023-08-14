@@ -12,7 +12,6 @@ import preg_split, {PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY} from "../modu
 import preg_replace from "locutus/php/pcre/preg_replace";
 import ord from "locutus/php/strings/ord";
 import substr from "locutus/php/strings/substr";
-import empty from "locutus/php/var/empty";
 
 export default class BBCodeLexer {
     public token: BBToken;         // Return token type:  One of the BBCODE_* constants.
@@ -452,7 +451,7 @@ export default class BBCodeLexer {
         }
         // The first piece should be the tag name, whatever it is.  If it starts with a /
         // we remove the / and mark it as an end tag.
-        if (!empty(pieces[ptr]) && substr(pieces[ptr], 0, 1) === '/') {
+        if (pieces[ptr] && substr(pieces[ptr], 0, 1) === '/') {
             result['_name'] = substr(pieces[ptr++], 1).toLowerCase();
             result['_end'] = true;
         } else {

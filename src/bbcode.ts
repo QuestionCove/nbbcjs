@@ -18,7 +18,6 @@ import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTy
 //TODO: Replace all PHP methods with native JavaScript
 import array_flip from 'locutus/php/array/array_flip';
 import basename from "locutus/php/filesystem/basename";
-import empty from "locutus/php/var/empty";
 import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
 import parse_url from 'locutus/php/url/parse_url';
@@ -761,13 +760,13 @@ export default class BBCode {
             }
             const validTLDIP = this.isValidTLD(URLParts['host'], true);
             // The TLD should be validated when there is no scheme.
-            if (URLParts !== false && empty(URLParts['scheme']) && !empty(URLParts['host']) && !validTLDIP) {
+            if (URLParts !== false && !URLParts['scheme'] && URLParts['host'] && !validTLDIP) {
                 URLParts = false;
             }
-            if (!empty(URLParts['scheme']) && empty(URLParts['host']) && validTLDIP) {
+            if (URLParts['scheme'] && !URLParts['host'] && validTLDIP) {
                 URLParts['host'] = URLParts['scheme'];
             }
-            if (URLParts === false || empty(URLParts['host'])) {
+            if (URLParts === false || !URLParts['host']) {
                 // Fix wrongly detected URL.
                 if (isURL) {
                     result.push('');
@@ -778,9 +777,9 @@ export default class BBCode {
                 if (!isURL) {
                     result.push('');
                 }
-                if (empty(URLParts['url'])) {
+                if (!URLParts['url']) {
                     let URL = part;
-                    if (empty(URLParts['scheme']) || URLParts['host'].startsWith(URLParts['scheme'])) {
+                    if (!URLParts['scheme'] || URLParts['host'].startsWith(URLParts['scheme'])) {
                         URL = 'http://'+part;
                     }
                     URLParts['url'] = URL;
@@ -880,7 +879,7 @@ export default class BBCode {
                 } else {
                     value = defaults[matches[1]] ? defaults[matches[1]] : null;
                 }
-                if (!empty(matches[2])) {
+                if (matches[2]) {
                     // We have one or more indexes, so break them apart and look up the requested data.
                     for (const index of matches[2].substring(1).split(".")) {
                         if (typeof value == "object") {
@@ -908,7 +907,7 @@ export default class BBCode {
                     break;
                 }
                 // See if there are any flags.
-                if (!empty(matches[3])) {
+                if (matches[3]) {
                     flags = array_flip(matches[3].split(''));
                 } else {
                     flags = [];
@@ -1629,7 +1628,7 @@ export default class BBCode {
     protected doEnhancedTag(tagRule: TagRules, params: boolean | TagType, contents: string): string {
         // Set up the special "_content" and "_defaultcontent" parameters.
         params['_content'] = contents;
-        params['_defaultcontent'] = !empty(params['_default']) ? params['_default'] : contents;
+        params['_defaultcontent'] = params['_default'] ? params['_default'] : contents;
         // Now use common template-formatting logic.
         if (tagRule['template']) {
             if (tagRule['default']) {

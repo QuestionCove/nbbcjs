@@ -8,7 +8,6 @@ import { TagRules, TagType } from "../@types/dataTypes";
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import parse_url from "locutus/php/url/parse_url";
-import empty from "locutus/php/var/empty";
 import preg_replace from "locutus/php/pcre/preg_replace";
 import ltrim from "locutus/php/strings/ltrim";
 import htmlspecialchars from "locutus/php/strings/htmlspecialchars";
@@ -449,7 +448,7 @@ export default class BBCodeLibrary {
             if (bbcode.getURLTargetable() !== false && params['target']) {
                 target = ' target="'+htmlspecialchars(params['target'])+'"';
             }
-            if (bbcode.getURLTarget() !== false && empty(target)) {
+            if (bbcode.getURLTarget() !== false && !target) {
                 target = ' target="'+htmlspecialchars(bbcode.getURLTarget())+'"';
             }
             // If `detectURLs` is on, it's possble the content is already
@@ -624,7 +623,7 @@ export default class BBCodeLibrary {
             return true;
         }
         content = bbcode.unHTMLEncode(strip_tags(content)).trim();
-        if (empty(content) && defaultValue) {
+        if (!content && defaultValue) {
             content = defaultValue;
         }
         const urlParts = parse_url(content) as Record<string, string>;
@@ -636,7 +635,7 @@ export default class BBCodeLibrary {
             ) {
                 const localImgURL = bbcode.getLocalImgURL();
                 return "<img src=\""
-                +htmlspecialchars((empty(localImgURL) ? '' : localImgURL+'/')+ltrim(urlParts['path'], '/'))+'" alt="'
+                +htmlspecialchars((!localImgURL ? '' : localImgURL+'/')+ltrim(urlParts['path'], '/'))+'" alt="'
                 +htmlspecialchars(basename(content))+'" class="bbcode_img" />';
             } else if (bbcode.isValidURL(content, false)) {
                 // Remote URL, or at least we don't know where it is.
