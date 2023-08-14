@@ -770,8 +770,7 @@ export default class BBCode {
             }
             const validTLDIP = this.isValidTLD($urlParts['host'], true);
             // The TLD should be validated when there is no scheme.
-            if ($urlParts !== false && empty($urlParts['scheme']) && !empty($urlParts['host'])
-                && !validTLDIP) {
+            if ($urlParts !== false && empty($urlParts['scheme']) && !empty($urlParts['host']) && !validTLDIP) {
                 $urlParts = false;
             }
             if (!empty($urlParts['scheme']) && empty($urlParts['host']) && validTLDIP) {
@@ -996,7 +995,7 @@ export default class BBCode {
                 // Not a tag, so just push it to the output.
                 $output.push($token);
                 if (this.$debug)
-                    Debugger.debug("Internal_GenerateOutput: push text:", $token[BBStack.TEXT]);
+                    Debugger.debug("Internal_GenerateOutput: push text:", `"${$token[BBStack.TEXT]}"`);
             } else {
                 // This is a start tag that is either ending-optional or ending-forgotten.
                 // But because of class dependencies, we can't simply reject it; deeper
@@ -1218,26 +1217,21 @@ export default class BBCode {
     }
     // Given a stack of tokens in $array, write it to a string (possibly with HTML
     // color and style encodings for readability, if $raw is false).
-    protected dumpStack($array?: any[], $raw = false) {
-        let $string;
-        if (!$raw)
-            $string = "<span style='color: #00C;'>";
-        else
-            $string = "";
+    protected dumpStack($array?: any[]): string {
+        let $string = "";
         if (!$array)
             $array = this.$stack;
         for (let $item of $array) {
-            const $genitem = {
+            $item = {...{
                 [BBStack.TOKEN]: null, 
                 [BBStack.TEXT]: null, 
                 [BBStack.TAG]: {
                     '_name': ''
                 }
-            };
-            $item = {...$genitem, ...$item};
+            }, ...$item};
             switch ($item[BBStack.TOKEN]) {
             case BBToken.TEXT:
-                $string += "\""+htmlspecialchars($item[BBStack.TEXT])+"\" ";
+                $string += JSON.stringify($item[BBStack.TEXT])+" ";
                 break;
             case BBToken.WS:
                 $string += "WS ";
@@ -1246,15 +1240,13 @@ export default class BBCode {
                 $string += "NL ";
                 break;
             case BBToken.TAG:
-                $string += "["+htmlspecialchars($item[BBStack.TAG]['_name'])+"] ";
+                $string += JSON.stringify(`[${$item[BBStack.TAG]['_name']}]`)+" ";
                 break;
             default:
                 $string += "unknown ";
                 break;
             }
         }
-        if (!$raw)
-            $string += "</span>";
         return $string;
     }
     //-----------------------------------------------------------------------------
@@ -2128,7 +2120,7 @@ export default class BBCode {
                 // Text is like an arithmetic operand, so just push it onto the stack because we
                 // won't know what to do with it until we reach an operator (e.g., a tag or EOI).
                 if (this.$debug) {
-                    Debugger.debug("Internal_ParseTextToken:", `fixup and push text: ${this.$lexer.$text}`);
+                    Debugger.debug("Internal_ParseTextToken:", `fixup and push text: "${this.$lexer.$text}"`);
                 }
                 // If this token pushes us past the output limit, split it up on a whitespace
                 // boundary, add as much as we can, and then abort.
