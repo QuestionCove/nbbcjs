@@ -8,7 +8,6 @@ import { TagRules, TagType } from "../@types/dataTypes";
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import parse_url from "locutus/php/url/parse_url";
-import preg_replace from "locutus/php/pcre/preg_replace";
 import ltrim from "locutus/php/strings/ltrim";
 import htmlspecialchars from "locutus/php/strings/htmlspecialchars";
 import strip_tags from "locutus/php/strings/strip_tags";
@@ -453,7 +452,7 @@ export default class BBCodeLibrary {
             }
             // If `detectURLs` is on, it's possble the content is already
             // enclosed in an <a href> tag. Remove that if that is the case.
-            content = preg_replace('/^\\<a [^\\>]*\\>(.*?)<\\/a>$/', "\\1", content);
+            content = content.replace(/^<a [^>]*>(.*?)<\/a>$/g, "$1");
             return bbcode.fillTemplate(bbcode.getURLTemplate(), {"url": url, "target": target, "content": content});
         } else {
             return htmlspecialchars(params['_tag'])+content+htmlspecialchars(params['_endtag']);

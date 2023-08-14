@@ -22,7 +22,6 @@ import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
 import parse_url from 'locutus/php/url/parse_url';
 import preg_quote from "locutus/php/pcre/preg_quote";
-import preg_replace from 'locutus/php/pcre/preg_replace';
 import rawurlencode from 'locutus/php/url/rawurlencode';
 import rtrim from 'locutus/php/strings/rtrim';
 import str_replace from 'locutus/php/strings/str_replace';
@@ -466,7 +465,7 @@ export default class BBCode {
     // newlines to a <br>, and regularizes the output to just use Un*x-style
     // newlines to boot.
     public nl2br(string: string): string {
-        return preg_replace("/\\x0A|\\x0D|\\x0A\\x0D|\\x0D\\x0A/", "<br>\n", string);
+        return string.replace(/\x0A|\x0D|\x0A\x0D|\x0D\x0A/g, "<br>\n");
     }
     // This function comes straight from the PHP documentation on html_entity_decode,
     // and performs exactly the same function.  Unlike html_entity_decode, it
@@ -481,7 +480,7 @@ export default class BBCode {
     // "Washington_D.C+", safe to pass through a URL or anywhere else.  All characters
     // in the extended-character range (0x7F-0xFF) will be URL-encoded.
     public wikify(string: string): string {
-        return rawurlencode(str_replace(" ", "_", trim(preg_replace("/[!?;@#\\$%\\^&*<>=+`~\\x00-\\x20_-]+/", " ", string))));
+        return rawurlencode(str_replace(" ", "_", trim(string.replace(/[!?;@#$%^&*<>=+`~\x00-\x20_-]+/g, " "))));
     }
     /**
      * Returns true if the given string is a valid URL.
@@ -914,7 +913,7 @@ export default class BBCode {
                 // If there are flags, process the value according to them.
                 if (!flags['v']) {
                     if (flags['w']) {
-                        value = preg_replace("/[\\x00-\\x09\\x0B-\x0C\x0E-\\x20]+/", " ", value);
+                        value = value.replace(/[\x00-\x09\x0B-\x0C\x0E-\x20]+/g, " ");
                     }
                     if (flags['t']) {
                         value = value.trim();
@@ -2243,9 +2242,9 @@ export default class BBCode {
         // the output as much as possible.
         if (this.plainMode) {
             // Turn all non-newline whitespace characters into single spaces.
-            result = preg_replace("/[\\x00-\\x09\\x0B-\\x20]+/", " ", result);
+            result = result.replace(/[\x00-\x09\x0B-\x20]+/g, " ");
             // Turn multiple newlines into at most two newlines.
-            result = preg_replace("/(?:[\\x20]*\\n){2,}[\\x20]*/", "\n\n", result);
+            result = result.replace(/(?:[\x20]*\n){2,}[\x20]*/g, "\n\n");
             // Strip off all surrounding whitespace.
             result = result.trim();
         }

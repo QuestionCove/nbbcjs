@@ -1,6 +1,5 @@
 //PHP Methods
 //TODO: Replace all PHP methods with native JavaScript
-import preg_replace from "locutus/php/pcre/preg_replace";
 import strrpos from "locutus/php/strings/strrpos";
 
 export default class EmailAddressValidator {
@@ -27,7 +26,7 @@ export default class EmailAddressValidator {
         // Count the "@" symbols. Only one is allowed, except where
         // contained in quote marks in the local part. Quickest way to
         // check this is to remove anything in quotes.
-        arrTempAddress[0] = preg_replace('/"[^"]+"/', '', arrEmailAddress[0]);
+        arrTempAddress[0] = arrEmailAddress[0].replace(/"[^"]+"/g, '');
         arrTempAddress[1] = arrEmailAddress[1];
         const strTempAddress = arrTempAddress[0] + arrTempAddress[1];
         // Then check - should be no "@" symbols.

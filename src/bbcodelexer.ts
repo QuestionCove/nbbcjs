@@ -7,10 +7,6 @@ import { Param, State, TagType } from "../@types/dataTypes";
 //Modules
 import preg_split, {PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY} from "../modules/preg_split";
 
-//PHP Functions
-//TODO: Replace all PHP methods with native JavaScript
-import preg_replace from "locutus/php/pcre/preg_replace";
-
 export default class BBCodeLexer {
     public token: BBToken;         // Return token type:  One of the BBCODE_* constants.
     public text: string;           // Actual exact, original text of token.
@@ -190,7 +186,7 @@ export default class BBCodeLexer {
             }
             // Inhale one token, sanitizing away any weird control characters.  We
             // allow \t, \r, and \n to pass through, but that's it.
-            this.text = preg_replace("/[\\x00-\\x08\\x0B-\\x0C\\x0E-\\x1F]/", "", this.input[this.ptr++]);
+            this.text = this.input[this.ptr++].replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F]/g, "");
             if (this.verbatim) {
                 // In verbatim mode, we return *everything* as plain text or whitespace.
                 this.tag = false;
