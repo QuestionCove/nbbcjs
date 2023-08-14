@@ -5,13 +5,13 @@ import Debugger from "./debugger";
 import { BBMode, BBType, BBAction } from '../@types/enums';
 import { TagRules, TagType } from "../@types/dataTypes";
 
-//Imports
+//Modules
 import { htmlEncode } from '../modules/html_entities';
+import strip_tags from '../modules/strip_tags';
 
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import parse_url from "locutus/php/url/parse_url";
-import strip_tags from "locutus/php/strings/strip_tags";
 import pathinfo from "locutus/php/filesystem/pathinfo";
 import basename from "locutus/php/filesystem/basename";
 
