@@ -1,5 +1,8 @@
-import fs from 'fs';
+//Types
 import { DebugLevel } from "../@types/enums";
+
+//Imports
+import fs from 'fs';
 
 export default class Debugger {
     public static level: DebugLevel = DebugLevel.warn;
