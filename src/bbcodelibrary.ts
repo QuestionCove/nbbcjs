@@ -17,7 +17,7 @@ import basename from "locutus/php/filesystem/basename";
 
 export default class BBCodeLibrary {
     /**
-     * @var defaultEmoji Standard library of smiley definitions.
+     * @var defaultEmoji Standard library of Emoji definitions.
      */
     public defaultEmoji: Record<string, string> = {
         ":)": "smile.gif",

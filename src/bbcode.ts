@@ -51,11 +51,11 @@ export default class BBCode {
     protected wasLimited: boolean;         // Set to true if the output was cut off.
     protected limitTail: string;           // What to add if the output is cut off.
     protected limitPrecision: number;      // How accurate should we be if we're cutting off text?
-    protected emojiDir: string;            // The host filesystem path to smileys (should be an absolute path).
-    protected emojiUrl: string;            // The URL path to smileys (possibly a relative path).
-    protected emoji;                       // The current list of smileys.
-    protected emojiRegex;                  // This is a regex, precomputed from the list of smileys above.
-    protected emojiEnabled: boolean;       // Whether or not to perform smiley-parsing.
+    protected emojiDir: string;            // The host filesystem path to emoji (should be an absolute path).
+    protected emojiUrl: string;            // The URL path to emoji (possibly a relative path).
+    protected emoji;                       // The current list of emoji.
+    protected emojiRegex;                  // This is a regex, precomputed from the list of emoji above.
+    protected emojiEnabled: boolean;       // Whether or not to perform emoji-parsing.
     protected wikiUrl: string;             // URL prefix used for [[wiki]] links.
     protected localImgDir: string;         // The host filesystem path to local images (should be an absolute path).
     protected localImgUrl: string;         // The URL path to local images (possibly a relative path).
@@ -69,7 +69,7 @@ export default class BBCode {
     protected preTrim: string;             // How to trim the whitespace at the start of the input.
     protected postTrim: string;            // How to trim the whitespace at the end of the input.
     public debug: boolean;                 // Enable debugging mode
-    protected maxSmileys: number;          // Maximum number of smileys that can be used in parse
+    protected maxEmoji: number;          // Maximum number of emoji that can be used in parse
     protected escapeContent: boolean;      // Encode HTML. POTENTIALLY DANGEROUS IF DISABLED. ONLY DISABLE IF YOU KNOW WHAT YOURE DOING.
     protected stack: StackType[];
     protected lexer: BBCodeLexer;
@@ -84,8 +84,8 @@ export default class BBCode {
         this.emoji = this.defaults.defaultEmoji;
         this.emojiEnabled = true;
         this.emojiRegex = false;
-        this.emojiDir = this.getDefaultSmileyDir();
-        this.emojiUrl = this.getDefaultSmileyURL();
+        this.emojiDir = this.getDefaultEmojiDir();
+        this.emojiUrl = this.getDefaultEmojiURL();
         this.wikiUrl = this.getDefaultWikiURL();
         this.localImgDir = this.getDefaultLocalImgDir();
         this.localImgUrl = this.getDefaultLocalImgURL();
@@ -114,7 +114,7 @@ export default class BBCode {
         this.quoteTemplate += '<div class="bbcode_quote_body">{$content/v}</div>' + "\n</div>\n";
         this.wikiUrlTemplate = '<a href="{$wikiURL/v}{$name/v}" class="bbcode_wiki">{$title/h}</a>';
         this.emailTemplate = '<a href="mailto:{$email/h}" class="bbcode_email">{$content/v}</a>';
-        this.maxSmileys = -1;
+        this.maxEmoji = -1;
         this.escapeContent = true;
         this.stack = [];
     }
@@ -374,84 +374,84 @@ export default class BBCode {
         return "\n<hr class=\"bbcode_rule\" />\n";
     }
     //-----------------------------------------------------------------------------
-    // Smiley management.  You can use the default smileys, or add your own.
+    // Emoji management.  You can use the default emoji, or add your own.
     // These are *mostly* getter/setter functions, but they also affect the
-    // caching of the smiley-processing rules.
-    public addSmiley(code: string, image: string) {
+    // caching of the emoji-processing rules.
+    public addEmoji(code: string, image: string) {
         this.emoji[code] = image;
         this.emojiRegex = false;
         return this;
     }
-    public removeSmiley(code: string) {
+    public removeEmoji(code: string) {
         delete this.emoji[code];
         this.emojiRegex = false;
         return this;
     }
-    public getSmiley(code: string) {
+    public getEmoji(code: string) {
         return this.emoji[code] ? this.emoji[code] : false;
     }
-    public clearSmileys() {
+    public clearEmoji() {
         this.emoji = {};
         this.emojiRegex = false;
         return this;
     }
-    public getDefaultSmiley(code: string) {
+    public getDefaultEmoji(code: string) {
         return this.defaults.defaultEmoji[code] ? this.defaults.defaultEmoji[code] : false;
     }
-    public setDefaultSmiley(code: string) {
+    public setDefaultEmoji(code: string) {
         if (this.defaults.defaultEmoji[code]) {
             this.emoji[code] = this.defaults.defaultEmoji[code];
         }
         this.emojiRegex = false;
         return this;
     }
-    public getDefaultSmileys() {
+    public getDefaultEmojis() {
         return this.defaults.defaultEmoji;
     }
-    public setDefaultSmileys() {
+    public setDefaultEmojis() {
         this.emoji = this.defaults.defaultEmoji;
         this.emojiRegex = false;
         return this;
     }
-    public setSmileyDir(path) {
+    public setEmojiDir(path) {
         this.emojiDir = path;
         return this;
     }
-    public getSmileyDir() {
+    public getEmojiDir() {
         return this.emojiDir;
     }
-    public getDefaultSmileyDir() {
-        return "smileys";
+    public getDefaultEmojiDir() {
+        return "emoji";
     }
-    public setSmileyURL(path) {
+    public setEmojiURL(path) {
         this.emojiUrl = path;
         return this;
     }
-    public getSmileyURL() {
+    public getEmojiURL() {
         return this.emojiUrl;
     }
-    public getDefaultSmileyURL() {
-        return "smileys";
+    public getDefaultEmojiURL() {
+        return "emoji";
     }
-    public setEnableSmileys(enable = true) {
+    public setEnableEmoji(enable = true) {
         this.emojiEnabled = enable;
         return this;
     }
-    public getEnableSmileys(): boolean {
+    public getEnableEmoji(): boolean {
         return this.emojiEnabled;
     }
-    public setMaxSmileys(count: number) {
-        this.maxSmileys = count;
-        if (this.maxSmileys < -1) {
-            this.maxSmileys = -1;
+    public setMaxEmoji(count: number) {
+        this.maxEmoji = count;
+        if (this.maxEmoji < -1) {
+            this.maxEmoji = -1;
         }
         return this;
     }
-    public getMaxSmileys(): number {
-        return this.maxSmileys;
+    public getMaxEmoji(): number {
+        return this.maxEmoji;
     }
     //-----------------------------------------------------------------------------
-    //  Smiley, URL, and HTML-conversion support routines.
+    //  Emoji, URL, and HTML-conversion support routines.
     // Like PHP's built-in nl2br, but this one can convert Windows, Un*x, or Mac
     // newlines to a <br>, and regularizes the output to just use Un*x-style
     // newlines to boot.
@@ -552,7 +552,7 @@ export default class BBCode {
      *
      * Go through a string containing plain text and do three things on it:
      * Replace < and > and & and " with HTML-safe equivalents, and replace
-     * smileys like :-) with <img /> tags, and replace any embedded URLs
+     * emoji like :-) with <img /> tags, and replace any embedded URLs
      * with <a href=...>...</a> links.
      *
      * @param string The string to process.
@@ -563,16 +563,16 @@ export default class BBCode {
         let output;
         if (!this.detectURLs) {
             // Easy case:  No URL-decoding, so don't take the time to do it.
-            output = this.processSmileys(string);
+            output = this.processEmoji(string);
         } else {
-            // Extract out any embedded URLs, and then process smileys and such on
+            // Extract out any embedded URLs, and then process emoji and such on
             // any text in between them.  This necessarily means that URLs get
-            // slightly higher priority than smileys do, although there really
-            // shouldn't be any overlap if the user's choices of smileys are at
+            // slightly higher priority than emoji do, although there really
+            // shouldn't be any overlap if the user's choices of emoji are at
             // least reasonably intelligent.  (For example, declaring "foo.com"
-            // or ":http:" to be smileys will probably not work, since the URL decoder
-            // will likely capture those before the smiley decoder ever has a chance
-            // at them.  But then you didn't want a smiley named "foo.com" anyway,
+            // or ":http:" to be emoji will probably not work, since the URL decoder
+            // will likely capture those before the emoji decoder ever has a chance
+            // at them.  But then you didn't want a emoji named "foo.com" anyway,
             // did you?)
             const chunks = this.autoDetectURLs(string);
             output = [];
@@ -581,7 +581,7 @@ export default class BBCode {
                 for (const chunk of chunks) {
                     let usechunk = chunk;
                     if (!isURL) {
-                        usechunk = this.processSmileys(chunk);
+                        usechunk = this.processEmoji(chunk);
                     }
                     output.push(usechunk);
                     isURL = !isURL;
@@ -594,30 +594,30 @@ export default class BBCode {
         return output;
     }
     /**
-     * Replace the smiley codes in a string with image tags.
+     * Replace the emoji codes in a string with image tags.
      *
      * Go through a string containing plain text and do two things on it:
      * Replace < and > and & and " with HTML-safe equivalents, and replace
-     * smileys like :-) with <img /> tags.
+     * emoji like :-) with <img /> tags.
      *
      * @param string The string to process.
      * @return Returns the processed version of {@link string}.
      */
-    protected processSmileys(string: string): string {
+    protected processEmoji(string: string): string {
         let output;
         if (!this.emojiEnabled || this.plainMode) {
-            // If smileys are turned off, don't convert them.
+            // If emoji are turned off, don't convert them.
             output = this.htmlEncode(string);
         } else {
-            // If the smileys need to be computed, process them now.
+            // If the emoji need to be computed, process them now.
             if (!this.emojiRegex) {
-                this.rebuildSmileys();
+                this.rebuildEmoji();
             }
-            // Split the string so that it consists of alternating pairs of smileys and non-smileys.
+            // Split the string so that it consists of alternating pairs of emoji and non-emoji.
             const tokens = preg_split(this.emojiRegex, string, -1, PREG_SPLIT_DELIM_CAPTURE);
             if (tokens.length <= 1) {
-                // Special (common) case:  This skips the smiley constructor if there
-                // were no smileys found, which is most of the time.
+                // Special (common) case:  This skips the emoji constructor if there
+                // were no emoji found, which is most of the time.
                 output = this.htmlEncode(string);
             } else {
                 output = "";
@@ -625,13 +625,13 @@ export default class BBCode {
                 let emojiCount = 0;
                 for (const token of tokens) {
                     if (!isEmoji) {
-                        // For non-smiley text, we just pass it through htmlEncode.
+                        // For non-emoji text, we just pass it through htmlEncode.
                         output += this.htmlEncode(token);
                     } else {
                         const alt = htmlEncode(token);
-                        if (emojiCount < this.maxSmileys || this.maxSmileys < 0) {
+                        if (emojiCount < this.maxEmoji || this.maxEmoji < 0) {
                             output += "<img src=\""+htmlEncode(this.emojiUrl+'/'+this.emoji[token])+'"'
-                                +` alt="${alt}" title="${alt}" class="bbcode_smiley" />`;
+                                +` alt="${alt}" title="${alt}" class="bbcode_emoji" />`;
                         } else {
                             output += token;
                         }
@@ -643,9 +643,9 @@ export default class BBCode {
         }
         return output;
     }
-    protected rebuildSmileys() {
-        // Construct the this.smileyRegex that can recognize all
-        // of the smileys.  This will save us a lot of computation time
+    protected rebuildEmoji() {
+        // Construct the this.emojiRegex that can recognize all
+        // of the emoji.  This will save us a lot of computation time
         // in this.parse() if multiple BBCode strings are being
         // processed by the same script.
         const regex = ["/(?<![\\w])("];
@@ -660,7 +660,7 @@ export default class BBCode {
         regex.push(")(?![\\w])/");
         this.emojiRegex = regex.join("");
         if (this.debug)
-            Debugger.debug("Internal_RebuildSmileys: regex:", this.emojiRegex);
+            Debugger.debug("Internal_RebuildEmoji: regex:", this.emojiRegex);
     }
     /**
      * Search through the input for URLs, or things that are URL-like and replace with anchor tags.
@@ -679,7 +679,7 @@ export default class BBCode {
      * In short, we look for domains and protocols, and if we find them, we consume any paths
      * or parameters after them, stopping at the first whitespace.
      *
-     * We use the same split-and-match technique used by the lexer and the smiley parser,
+     * We use the same split-and-match technique used by the lexer and the emoji parser,
      * since it's the fastest way to perform tokenization in PHP.
      *
      * Once we find the URL, we convert it according to the rule given in this.urlPattern.
@@ -1388,7 +1388,7 @@ export default class BBCode {
     //        This value has NOT been passed through htmlEncode().
     //
     //   `params` is an array of key: value parameters associated with the tag; for example,
-    //        in [smiley src=smile alt=:-)], it's `['src': "smile", 'alt': ":-)"]`.
+    //        in [emoji src=smile alt=:-)], it's `['src': "smile", 'alt': ":-)"]`.
     //        These keys and values have NOT beel passed through htmlEncode().
     //
     //   `contents` is the body of the tag during BBCODE_OUTPUT.  For example, in

@@ -101,9 +101,9 @@ const tests = {
             html: "This &lt;woo!&gt; &amp;&quot;yeah!&quot; &apos;sizzle&apos;",
         },
         {
-            descr: ":-) produces a smiley <img> element.",
+            descr: ":-) produces an emoji <img> element.",
             bbcode: "This is a test of the emergency broadcasting system :-)",
-            html: 'This is a test of the emergency broadcasting system <img src="smileys/smile.gif" alt=":-)" title=":-)" class="bbcode_smiley" />',
+            html: 'This is a test of the emergency broadcasting system <img src="emoji/smile.gif" alt=":-)" title=":-)" class="bbcode_emoji" />',
         },
         {
             descr: "--- does *not* produce a [rule] tag.",
@@ -484,7 +484,7 @@ const tests = {
             urltarget: "override",
         },
         {
-            descr: "[url=(includes a smiley)] is not converted into a smiley.",
+            descr: "[url=(includes an emoji)] is not converted into an emoji.",
             bbcode: "This is a test of the [url=http://www.google.com/foo:-P]emergency broadcasting system[/url].",
             html: 'This is a test of the <a href="http://www.google.com/foo:-P" class="bbcode_url">emergency broadcasting system</a>.',
         }
@@ -551,7 +551,7 @@ const tests = {
             detect_urls: true,
         },
         {
-            descr: "Embedded-URL detector takes precedence over the smiley detector.",
+            descr: "Embedded-URL detector takes precedence over the emoji detector.",
             bbcode: "This is a good dictionary:  http://www.amazon.com/Oxford-Dictionary-American-Usage-Style/dp/0195135083/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1217890161&sr=8-1&x=p",
             html: 'This is a good dictionary:  <a href="http://www.amazon.com/Oxford-Dictionary-American-Usage-Style/dp/0195135083/ref=pd_bbs_sr_1?ie=UTF8&amp;s=books&amp;qid=1217890161&amp;sr=8-1&amp;x=p">http://www.amazon.com/Oxford-Dictionary-American-Usage-Style/dp/0195135083/ref=pd_bbs_sr_1?ie=UTF8&amp;s=books&amp;qid=1217890161&amp;sr=8-1&amp;x=p</a>',
             detect_urls: true,
@@ -632,18 +632,18 @@ const tests = {
         },
         {
             descr: "[img] can produce a local image.",
-            bbcode: "This is a smiley: [img]smile.gif[/img].",
-            html: 'This is a smiley: <img src="smileys/smile.gif" alt="smile.gif" class="bbcode_img" />.',
+            bbcode: "This is an emoji: [img]smile.gif[/img].",
+            html: 'This is an emoji: <img src="smileys/smile.gif" alt="smile.gif" class="bbcode_img" />.',
         },
         {
             descr: "[img] can produce a local rooted URL.",
-            bbcode: "This is a smiley: [img]/smile.gif[/img].",
-            html: 'This is a smiley: <img src="/smile.gif" alt="smile.gif" class="bbcode_img" />.',
+            bbcode: "This is an emoji: [img]/smile.gif[/img].",
+            html: 'This is an emoji: <img src="/smile.gif" alt="smile.gif" class="bbcode_img" />.',
         },
         {
             descr: "[img] can produce a local relative URL.",
-            bbcode: "This is a smiley: [img]../smile.gif[/img].",
-            html: 'This is a smiley: <img src="../smile.gif" alt="smile.gif" class="bbcode_img" />.',
+            bbcode: "This is an emoji: [img]../smile.gif[/img].",
+            html: 'This is an emoji: <img src="../smile.gif" alt="smile.gif" class="bbcode_img" />.',
         },
         {
             descr: "[rule] produces a horizontal rule.",
@@ -706,7 +706,7 @@ const tests = {
         {
             descr: "Multiple nested [quote]...[/quote] tags should produce nested quotes.",
             bbcode: "[quote]\n[quote]\n[quote]text1[/quote]\ntext2[/quote]\ntext3[/quote]\ntext4 :) text5 :o text6 :o",
-            html: '\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">text1</div>\n</div>\ntext2</div>\n</div>\ntext3</div>\n</div>\ntext4 <img src="smileys/smile.gif" alt=":)" title=":)" class="bbcode_smiley" /> text5 :o text6 :o',
+            html: '\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">text1</div>\n</div>\ntext2</div>\n</div>\ntext3</div>\n</div>\ntext4 <img src="emoji/smile.gif" alt=":)" title=":)" class="bbcode_emoji" /> text5 :o text6 :o',
         },
         {
             descr: "[quote=John]...[/quote] should produce a quote from John.",

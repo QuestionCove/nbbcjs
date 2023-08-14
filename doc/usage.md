@@ -9,7 +9,7 @@ First, decide whether you will be using it Client Side or Server Side, we offer 
   - [Installation](#installation)
   - [Usage](#usage)
     - [Autoparsing URLs](#autoparsing-urls)
-    - [Adding Smileys](#adding-smileys)
+    - [Adding Emoji](#adding-emoji)
   - [Creating new tags](#creating-new-tags)
     - [Simple Tags](#simple-tags)
     - [Enhanced Tags](#enhanced-tags)
@@ -58,15 +58,15 @@ Additionally, you can set the template for URLs like this:
 bbcode.setURLPattern('<a href="{$url/h}">{$text/h}</a>');
 ```
 
-### Adding Smileys
+### Adding Emoji
 
-Now what if we wanted to add new Emoticons/Smileys/Emoji, we could do that with the addSmiley API!
+Now what if we wanted to add new Emoji (Emoticons/Smileys), we could do that with the addEmoji API!
 
 ```ts
-bbcode.addSmiley(":monkas:", "monkas.png");
+bbcode.addEmoji(":monkas:", "monkas.png");
 ```
 
-The above would add an Emoji to the parser for the text `:monkas` that would go to the image `./monkas.png`
+The above would add an Emoji to the parser for the text `:monkas:` that would go to the image `./monkas.png`
 
 ## Creating new tags
 

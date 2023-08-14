@@ -14,7 +14,7 @@
 
 ## Overview
 
-NBBC is a high-speed, extensible, easy-to-use validating BBCode parser that accepts BBCode as input and generates HTML5 compliant markup as its output no matter how mangled the input. It includes built-in support for most common BBCode, as well as external-wiki support, image-library support, a standard library of smileys (emoticons), and via its powerful API it can even be transformed into a validating HTML parser!
+NBBC is a high-speed, extensible, easy-to-use validating BBCode parser that accepts BBCode as input and generates HTML5 compliant markup as its output no matter how mangled the input. It includes built-in support for most common BBCode, as well as external-wiki support, image-library support, a standard library of Emoji (Emoticons/Smileys), and via its powerful API it can even be transformed into a validating HTML parser!
 
 NBBC is well-tested, with its output validated against a unit-test suite with over a hundred different tests. It is written entirely in TypeScript, using clean, object-oriented code, and it is compatible Node >=16.
 
