@@ -11,6 +11,7 @@ import filter_var from "../modules/filter_var";
 import method_exists from "../modules/method_exists";
 import { htmlEncode, htmlDecode } from '../modules/html_entities';
 import strip_tags from '../modules/strip_tags';
+import basename from '../modules/basename';
 
 //Types
 import { BBStack, BBToken, BBMode, BBType, BBAction, DebugLevel } from '../@types/enums';
@@ -18,7 +19,6 @@ import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTy
 
 //PHP Methods
 //TODO: Replace all PHP methods with native JavaScript
-import basename from "locutus/php/filesystem/basename";
 import parse_url from 'locutus/php/url/parse_url';
 import str_replace from 'locutus/php/strings/str_replace';
 
