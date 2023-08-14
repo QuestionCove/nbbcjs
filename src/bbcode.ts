@@ -16,7 +16,6 @@ import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTy
 
 //PHP Methods
 //TODO: Replace all PHP methods with native JavaScript
-import array_flip from 'locutus/php/array/array_flip';
 import basename from "locutus/php/filesystem/basename";
 import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
@@ -854,7 +853,7 @@ export default class BBCode {
         const result = [];
         let isInsert = false;
         for (const piece of pieces) {
-            let matches, value, flags;
+            let matches, value;
             if (!isInsert) {
                 if (this.debug)
                     Debugger.debug("FormatInserts: add text:", piece);
@@ -898,33 +897,32 @@ export default class BBCode {
                     value = "";
                     break;
                 }
+                let flags: string[] = [];
                 // See if there are any flags.
                 if (matches[3]) {
-                    flags = array_flip(matches[3].split(''));
-                } else {
-                    flags = [];
+                    flags = matches[3].split('');
                 }
                 // If there are flags, process the value according to them.
-                if (!flags['v']) {
-                    if (flags['w']) {
+                if (!flags.includes('v')) {
+                    if (flags.includes('w')) {
                         value = value.replace(/[\x00-\x09\x0B-\x0C\x0E-\x20]+/g, " ");
                     }
-                    if (flags['t']) {
+                    if (flags.includes('t')) {
                         value = value.trim();
                     }
-                    if (flags['b']) {
+                    if (flags.includes('b')) {
                         value = basename(value);
                     }
-                    if (flags['e']) {
+                    if (flags.includes('e')) {
                         value = this.htmlEncode(value);
-                    } else if (flags['k']) {
+                    } else if (flags.includes('k')) {
                         value = this.wikify(value);
-                    } else if (flags['h']) {
+                    } else if (flags.includes('h')) {
                         value = htmlspecialchars(value);
-                    } else if (flags['u']) {
+                    } else if (flags.includes('u')) {
                         value = encodeURIComponent(value);
                     }
-                    if (flags['n']) {
+                    if (flags.includes('n')) {
                         value = this.nl2br(value);
                     }
                 }
