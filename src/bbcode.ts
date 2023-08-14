@@ -21,7 +21,6 @@ import basename from "locutus/php/filesystem/basename";
 import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
 import parse_url from 'locutus/php/url/parse_url';
-import preg_quote from "locutus/php/pcre/preg_quote";
 import rtrim from 'locutus/php/strings/rtrim';
 import str_replace from 'locutus/php/strings/str_replace';
 import strip_tags from "locutus/php/strings/strip_tags";
@@ -660,7 +659,7 @@ export default class BBCode {
             const filename = this.emoji[code];
             if (!first)
                 regex.push("|");
-            regex.push(preg_quote(code, '/'));
+            regex.push(code.replace(/[.+*?[^\]$(){}=!<>|:\\/-]/g, '\\$&'));
             first = false;
         }
         regex.push(")(?![\\w])/");
