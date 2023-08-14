@@ -20,7 +20,6 @@ import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTy
 //PHP Methods
 //TODO: Replace all PHP methods with native JavaScript
 import parse_url from 'locutus/php/url/parse_url';
-import str_replace from 'locutus/php/strings/str_replace';
 
 export default class BBCode {
     /**
@@ -40,7 +39,7 @@ export default class BBCode {
     protected rootClass: ClassType;        // The root container class.
     protected lostStartTags: Record<string, number>;     // For repair when tags are badly mis-nested.
     protected startTags;         // An associative array of locations of start tags on the stack.
-    protected allowAmpersand: boolean;     // If true, we use str_replace() instead of htmlEncode().
+    protected allowAmpersand: boolean;     // If true, we use String.replaceAll() instead of htmlEncode().
     protected tagMarker: string;           // Set to '[', '<', '{', or '('.
     protected ignoreNewlines;              // If true, newlines will be treated as normal whitespace.
     protected plainMode: boolean;          // Don't output tags:  Just output text/whitespace/newlines only.
@@ -469,7 +468,7 @@ export default class BBCode {
     // "Washington_D.C+", safe to pass through a URL or anywhere else.  All characters
     // in the extended-character range (0x7F-0xFF) will be URL-encoded.
     public wikify(string: string): string {
-        return encodeURIComponent(str_replace(" ", "_", string.replace(/[!?;@#$%^&*<>=+`~\x00-\x20_-]+/g, " ").trim()));
+        return encodeURIComponent(string.replace(/[!?;@#$%^&*<>=+`~\x00-\x20_-]+/g, " ").trim().replaceAll(" ", "_"));
     }
     /**
      * Returns true if the given string is a valid URL.
@@ -541,7 +540,7 @@ export default class BBCode {
             if (!this.allowAmpersand) {
                 return htmlEncode(string);
             } else {
-                return str_replace(['<', '>', '"'], ['&lt;', '&gt;', '&quot;'], string);
+                return string.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
             }
         } else {
             return string;
