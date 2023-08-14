@@ -10,7 +10,6 @@ import { TagRules, TagType } from "../@types/dataTypes";
 import parse_url from "locutus/php/url/parse_url";
 import empty from "locutus/php/var/empty";
 import preg_replace from "locutus/php/pcre/preg_replace";
-import in_array from "locutus/php/array/in_array";
 import ltrim from "locutus/php/strings/ltrim";
 import htmlspecialchars from "locutus/php/strings/htmlspecialchars";
 import strip_tags from "locutus/php/strings/strip_tags";
@@ -633,7 +632,7 @@ export default class BBCodeLibrary {
             if (urlParts['path'] &&
                !urlParts['scheme'] &&
                !/^.{0,2}\//.test(urlParts['path']) &&
-               in_array(pathinfo(urlParts['path'], 'PATHINFO_EXTENSION'), this.imageExtensions)
+               this.imageExtensions.includes(pathinfo(urlParts['path'], 'PATHINFO_EXTENSION'))
             ) {
                 const localImgURL = bbcode.getLocalImgURL();
                 return "<img src=\""

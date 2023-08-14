@@ -21,7 +21,6 @@ import basename from "locutus/php/filesystem/basename";
 import empty from "locutus/php/var/empty";
 import html_entity_decode from 'locutus/php/strings/html_entity_decode';
 import htmlspecialchars from 'locutus/php/strings/htmlspecialchars';
-import in_array from 'locutus/php/array/in_array';
 import parse_url from 'locutus/php/url/parse_url';
 import preg_quote from "locutus/php/pcre/preg_quote";
 import preg_replace from 'locutus/php/pcre/preg_replace';
@@ -510,7 +509,7 @@ export default class BBCode {
     public isValidURL(string: string, emailToo: boolean = true): boolean {
         // Validate using PHP's fast filter method.
         if (filter_var(string, 'FILTER_VALIDATE_URL') !== false &&
-            in_array(parse_url(string, 'PHP_URL_SCHEME'), ['http', 'https', 'ftp'])) {
+            ['http', 'https', 'ftp'].includes(parse_url(string, 'PHP_URL_SCHEME'))) {
             return true;
         }
         // Check for anything that does *not* have a colon in it before the first
@@ -815,10 +814,10 @@ export default class BBCode {
             return host === 'localhost';
         }
         // Strip the TLD portion from the string.
-        const TLD = trim(strrchr(host, '.'), '.');
+        const TLD: string = trim(strrchr(host, '.'), '.');
         // Check against the known TLDs.
         // We'll just assume that two letter TLDs are valid to avoid too many checks.
-        if (in_array(TLD, validTLDs) || /^[a-z]{2}$/.test(TLD)) {
+        if (validTLDs.includes(TLD) || /^[a-z]{2}$/.test(TLD)) {
             return true;
         }
         return false;
@@ -1115,10 +1114,10 @@ export default class BBCode {
         // Walk backward from the top of the stack, searching for a state where
         // the new class was still legal.
         let pos = this.stack.length - 1;
-        while (pos >= 0 && !in_array(this.stack[pos][BBStack.CLASS], classList))
+        while (pos >= 0 && !classList.includes(this.stack[pos][BBStack.CLASS]))
             pos--;
         if (pos < 0) {
-            if (!in_array(this.rootClass, classList))
+            if (!classList.includes(this.rootClass))
                 return false;
         }
         if (this.debug)
@@ -1895,7 +1894,7 @@ export default class BBCode {
         // it's legal to put an inline tag inside a block tag, but not legal to put a
         // block tag inside an inline tag.
         const allowIn = Array.isArray(tagRule['allow_in']) ? tagRule['allow_in'] : [this.rootClass];
-        if (!in_array(this.currentClass, allowIn)) {
+        if (!allowIn.includes(this.currentClass)) {
             // Not allowed.  Rewind the stack backward until it is allowed.
             if (this.debug) {
                 Debugger.debug("Internal_ParseStartTagToken:", `tag [${tagName}] is disallowed inside class ${this.currentClass}; rewinding stack to a safe class.`);
