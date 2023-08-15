@@ -13,7 +13,6 @@ import basename from '../modules/basename';
 //PHP Functions
 //TODO: Replace all PHP methods with native JavaScript
 import parse_url from "locutus/php/url/parse_url";
-import pathinfo from "locutus/php/filesystem/pathinfo";
 
 export default class BBCodeLibrary {
     /**
@@ -631,7 +630,7 @@ export default class BBCodeLibrary {
             if (urlParts['path'] &&
                !urlParts['scheme'] &&
                !/^.{0,2}\//.test(urlParts['path']) &&
-               this.imageExtensions.includes(pathinfo(urlParts['path'], 'PATHINFO_EXTENSION'))
+               this.imageExtensions.includes(/(?:\.([^.]+))?$/.exec(urlParts['path'])[1])
             ) {
                 const localImgURL = bbcode.getLocalImgURL();
                 return "<img src=\""
