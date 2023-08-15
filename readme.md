@@ -88,7 +88,9 @@ to:
 }
 ```
 
-Additionally, for BBMode.CALLBACK, there is a new element called `callback`, which should be a callback function to be called, previously this would have been `method` and would have been the function name with the function existing in the global scope.
+For BBMode.CALLBACK, there is a new element called `callback`, which should be a callback function to be called, previously this would have been `method` and would have been the function name with the function existing in the global scope.
+
+Smileys have been renamed to Emoji, and all methods now reflect this. `bbcode.getSmileys()` is now `bbcode.getEmoji()`; The css class `bbcode_smiley` has been changed to `bbcode_emoji`, among other instances of this.
 
 ## Credits
 
