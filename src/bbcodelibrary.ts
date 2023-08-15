@@ -427,7 +427,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns the full HTML url.
      */
-    public doURL(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | true {
+    public doURL(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | true {
         // We can't check this with BBCODE_CHECK because we may have no URL
         // before the content has been processed.
         if (action == BBAction.CHECK) {
@@ -469,7 +469,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return string Returns the email link HTML.
      */
-    public doEmail(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | true {
+    public doEmail(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | true {
         // We can't check this with BBCODE_CHECK because we may have no URL
         // before the content has been processed.
         if (action == BBAction.CHECK) {
@@ -495,7 +495,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns a span with the font size CSS.
      */
-    public doSize(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string {
+    public doSize(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string {
         let size: any;
         switch (defaultValue) {
         case '0':
@@ -547,7 +547,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns a span with the font family CSS.
      */
-    public doFont(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string {
+    public doFont(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string {
         const fonts = defaultValue.split(',');
         let result = "";
         const specialFonts: Record<string, string> = {
@@ -588,7 +588,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns a link to the wiki.
      */
-    public doWiki(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | boolean {
+    public doWiki(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | boolean {
         let title;
         name = bbcode.wikify(defaultValue);
         if (action == BBAction.CHECK) {
@@ -613,7 +613,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns the image tag.
      */
-    public doImage(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): string | true {
+    public doImage(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | true {
         // We can't validate this until we have its content.
         if (action == BBAction.CHECK) {
             return true;
@@ -654,7 +654,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns the rule HTML or **true** if {@link action} is **BBAction.BBCODE_CHECK**.
      */
-    public doRule(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): boolean | string {
+    public doRule(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): boolean | string {
         if (action == BBAction.CHECK) {
             return true;
         } else {
@@ -690,7 +690,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns the quote HTML or **true** if {@link action} is **BBAction.BBCODE_CHECK**.
      */
-    public doQuote(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: boolean | TagType, content: string): boolean | string {
+    public doQuote(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): boolean | string {
         if (action == BBAction.CHECK) {
             return true;
         }
@@ -743,7 +743,7 @@ export default class BBCodeLibrary {
      * @param content The content of the tag. Only available when {@link action} is {@link BBAction.OUTPUT}.
      * @return Returns the list HTML or a boolen result when {@link action} is **BBAction.BBCODE_CHECK**.
      */
-    public doList(bbcode: BBCode, action: BBAction, name: string, defaultValue: string|null, params: boolean | TagType, content: string): boolean | string {
+    public doList(bbcode: BBCode, action: BBAction, name: string, defaultValue: string|undefined, params: TagType, content: string): boolean | string {
         // Allowed list styles, striaght from the CSS 2.1 spec.  The only prohibited
         // list style is that with image-based markers, which often slows down web sites.
         const listStyles: Record<string, string> = {
@@ -767,7 +767,7 @@ export default class BBCodeLibrary {
             "disc": "disc",
             "square": "square"
         };
-        defaultValue = defaultValue ? defaultValue.trim() : null;
+        defaultValue = defaultValue ? defaultValue.trim() : undefined;
         if (action == BBAction.CHECK) {
             if (!(typeof defaultValue == "string")) {
                 return true;

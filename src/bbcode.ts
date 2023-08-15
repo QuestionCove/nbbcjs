@@ -74,7 +74,7 @@ export default class BBCode {
      *
      * @param library The BBCode Library Class, It's possible to create your own via extending BBCodeLibrary
      */
-    public constructor(library: BBCodeLibrary | null = null) {
+    public constructor(library?: BBCodeLibrary) {
         this.defaults = library ? library : new BBCodeLibrary();
         this.tagRules = this.defaults.defaultTagRules;
         this.emoji = this.defaults.defaultEmoji;
@@ -861,13 +861,13 @@ export default class BBCode {
                 if (inserts[matches[1]]) {
                     value = inserts[matches[1]];
                 } else {
-                    value = defaults[matches[1]] ? defaults[matches[1]] : null;
+                    value = defaults[matches[1]] ? defaults[matches[1]] : undefined;
                 }
                 if (matches[2]) {
                     // We have one or more indexes, so break them apart and look up the requested data.
                     for (const index of matches[2].slice(1).split(".")) {
                         if (typeof value == "object") {
-                            value = value[index] ? value[index] : null;
+                            value = value[index] ? value[index] : undefined;
                         } else {
                             value = '';
                         }
@@ -991,15 +991,15 @@ export default class BBCode {
                 // alternative to having to perform two passes over the input, one to validate
                 // classes and the other to convert the output:  So we choose speed over
                 // precision here, but it's a decision that only affects broken tags anyway.
-                const name = token[BBStack.TAG]['_name'] ? token[BBStack.TAG]['_name'] : null;
-                let rule = this.tagRules[name] ? this.tagRules[name] : null;
+                const name = token[BBStack.TAG]['_name'] ? token[BBStack.TAG]['_name'] : undefined;
+                let rule = this.tagRules[name] ? this.tagRules[name] : undefined;
                 let tagOutput;
                 // Add default to the rule.
                 rule = {...{
                     'end_tag': BBType.REQUIRED, 
-                    'before_endtag': null, 
-                    'after_tag': null, 
-                    'before_tag': null
+                    'before_endtag': undefined, 
+                    'after_tag': undefined, 
+                    'before_tag': undefined
                 }, ...rule};
                 const endTag = rule['end_tag'];
                 this.startTags[name].pop(); // Remove the locator for this tag.
@@ -1042,7 +1042,7 @@ export default class BBCode {
                         tagOutput = this.doTag(
                             BBAction.OUTPUT,
                             name,
-                            token[BBStack.TAG]['_default'] ? token[BBStack.TAG]['_default'] : null,
+                            token[BBStack.TAG]['_default'] ? token[BBStack.TAG]['_default'] : undefined,
                             token[BBStack.TAG],
                             tagBody
                         );
@@ -1050,8 +1050,8 @@ export default class BBCode {
                         tagOutput = this.doTag(
                             BBAction.OUTPUT,
                             name,
-                            null,
-                            null,
+                            undefined,
+                            undefined,
                             tagBody
                         );
                     }
@@ -1158,12 +1158,12 @@ export default class BBCode {
         // to the start tag itself.)
         if (this.tagRules[tagName] && this.tagRules[tagName]['after_tag']) {
             newpos = this.cleanupWSByIteratingPointer(
-                this.tagRules[tagName]['after_tag'] ? this.tagRules[tagName]['after_tag'] : null,
+                this.tagRules[tagName]['after_tag'] ? this.tagRules[tagName]['after_tag'] : undefined,
                 pos + 1,
                 this.stack
             );
         } else {
-            newpos = this.cleanupWSByIteratingPointer(null, pos + 1, this.stack);
+            newpos = this.cleanupWSByIteratingPointer(undefined, pos + 1, this.stack);
         }
         let delta = newpos - (pos + 1);
         if (this.debug) {
@@ -1177,7 +1177,7 @@ export default class BBCode {
         if (this.tagRules[tagName] && this.tagRules[tagName]['before_endtag']) {
             newend = this.cleanupWSByIteratingPointer(this.tagRules[tagName]['before_endtag'], 0, output);
         } else {
-            newend = this.cleanupWSByIteratingPointer(null, 0, output);
+            newend = this.cleanupWSByIteratingPointer(undefined, 0, output);
         }
         const fulloutput = this.collectTextReverse(output, output.length - 1, newend);
         if (this.debug)
@@ -1208,8 +1208,8 @@ export default class BBCode {
             array = this.stack;
         for (let item of array) {
             item = {...{
-                [BBStack.TOKEN]: null, 
-                [BBStack.TEXT]: null, 
+                [BBStack.TOKEN]: undefined, 
+                [BBStack.TEXT]: undefined, 
                 [BBStack.TAG]: {
                     '_name': ''
                 }
@@ -1238,7 +1238,7 @@ export default class BBCode {
     //  Whitespace cleanup routines (internal).
     // Walk down from the top of the stack, and remove whitespace/newline tokens from
     // the top according to the rules in the given pattern.
-    protected cleanupWSByPoppingStack(pattern: string, array: StackType[]) {
+    protected cleanupWSByPoppingStack(pattern: string | undefined, array: StackType[]) {
         if (this.debug) {
             Debugger.debug("Internal_CleanupWSByPoppingStack:", `array has ${array.length} items; pattern="${pattern}"`);
         }
@@ -1273,7 +1273,7 @@ export default class BBCode {
     }
     // Read tokens from the input, and remove whitespace/newline tokens from the input
     // according to the rules in the given pattern.
-    protected cleanupWSByEatingInput(pattern: string) {
+    protected cleanupWSByEatingInput(pattern?: string) {
         if (this.debug)
             Debugger.debug("Internal_CleanupWSByEatingInput:", `input pointer is at ${this.lexer.ptr}; pattern="${pattern}"`);
         if (!pattern)
@@ -1307,7 +1307,7 @@ export default class BBCode {
     }
     // Read tokens from the given position in the stack, going forward as we match
     // the rules in the given pattern.  Returns the first position *after* the pattern.
-    protected cleanupWSByIteratingPointer(pattern: string, pos: number, array: StackType[]) {
+    protected cleanupWSByIteratingPointer(pattern: string | undefined, pos: number, array: StackType[]) {
         if (this.debug) {
             Debugger.debug("Internal_CleanupWSByIteratingPointer:", `pointer is ${pos}; pattern="${pattern}"`);
         }
@@ -1395,7 +1395,7 @@ export default class BBCode {
     // (if the tag definition is not valid); for BBCODE_OUTPUT, this function must return
     // HTML output.
     public doTag(action: BBAction, tagName: string, defaultValue: string, params: boolean | TagType, contents: string) {
-        let tagRule = this.tagRules[tagName] ? this.tagRules[tagName] : null;
+        let tagRule = this.tagRules[tagName] ? this.tagRules[tagName] : undefined;
         let value, plainContent, possibleContent, start, end, link, result;
         switch (action) {
         case BBAction.CHECK:
@@ -1408,7 +1408,7 @@ export default class BBCode {
                     if (param == '_content') {
                         value = contents;
                     } else if (param == '_defaultcontent') {
-                        if (defaultValue.length) {
+                        if (defaultValue) {
                             value = defaultValue;
                         } else {
                             value = contents;
@@ -1418,9 +1418,9 @@ export default class BBCode {
                             value = params[param];
                         } else {
                             if (tagRule['default']) {
-                                value = tagRule['default'][param] ? tagRule['default'][param] : null;
+                                value = tagRule['default'][param] ? tagRule['default'][param] : undefined;
                             } else {
-                                value = null;
+                                value = undefined;
                             }
                         }
                     }
@@ -1617,13 +1617,13 @@ export default class BBCode {
             if (tagRule['default']) {
                 return this.fillTemplate(tagRule['template'], params, tagRule['default']);
             } else {
-                return this.fillTemplate(tagRule['template'], params, null);
+                return this.fillTemplate(tagRule['template'], params, undefined);
             }
         } else {
             if (tagRule['default']) {
-                return this.fillTemplate(null, params, tagRule['default']);
+                return this.fillTemplate(undefined, params, tagRule['default']);
             } else {
-                return this.fillTemplate(null, params, null);
+                return this.fillTemplate(undefined, params, undefined);
             }
         }
     }
@@ -1665,9 +1665,9 @@ export default class BBCode {
             Debugger.debug("ProcessIsolatedTag:", `tag [${tagName}] is isolated: no end tag allowed, so processing immediately.`);
         }
         tagRule = {...{
-            "_default": null,
-            "before_tag": null,
-            "after_tag": null
+            "_default": undefined,
+            "before_tag": undefined,
+            "after_tag": undefined
         }, ...tagRule};
         // Ask this tag if its attributes are valid; this gives the tag
         // the option to say, no, I'm broken, don't try to process me.
@@ -1779,17 +1779,17 @@ export default class BBCode {
         if (tagRule['after_tag']) {
             newstart = this.cleanupWSByIteratingPointer(tagRule['after_tag'], start, this.stack);
         } else {
-            newstart = this.cleanupWSByIteratingPointer(null, start, this.stack);
+            newstart = this.cleanupWSByIteratingPointer(undefined, start, this.stack);
         }
         if (tagRule['before_endtag']) {
             this.cleanupWSByPoppingStack(tagRule['before_endtag'], this.stack);
         } else {
-            this.cleanupWSByPoppingStack(null, this.stack);
+            this.cleanupWSByPoppingStack(undefined, this.stack);
         }
         if (tagRule['after_endtag']) {
             this.cleanupWSByEatingInput(tagRule['after_endtag']);
         } else {
-            this.cleanupWSByEatingInput(null);
+            this.cleanupWSByEatingInput(undefined);
         }
         // Collect the output from `newstart` to the top of the stack, and then
         // quickly pop off all of those tokens.
@@ -1804,7 +1804,7 @@ export default class BBCode {
         if (tagRule['before_tag']) {
             this.cleanupWSByPoppingStack(tagRule['before_tag'], this.stack);
         } else {
-            this.cleanupWSByPoppingStack(null, this.stack);
+            this.cleanupWSByPoppingStack(undefined, this.stack);
         }
         // Found the end tag, so process this tag immediately with
         // the contents collected between them.  Note that we do NOT
@@ -1814,7 +1814,7 @@ export default class BBCode {
         tagParams['_endtag'] = endTagParams;
         tagParams['_hasend'] = true;
         if (!tagParams['_default']) {
-            tagParams['_default'] = null;
+            tagParams['_default'] = undefined;
         }
         const output = this.doTag(BBAction.OUTPUT, tagName, tagParams['_default'], tagParams, content);
         if (this.debug) {
@@ -1835,7 +1835,7 @@ export default class BBCode {
         // all at once.  First, let's look up what we know about the tag we've
         // encountered.
         const tagParams = this.lexer.tag;
-        const tagName = tagParams['_name'] ? tagParams['_name'] : null;
+        const tagName = tagParams['_name'] ? tagParams['_name'] : undefined;
         if (this.debug) {
             Debugger.debug("Internal_ParseStartTagToken:", `got tag [${tagName}]`);
         }
@@ -1912,7 +1912,7 @@ export default class BBCode {
         }
         // Ask this tag if its attributes are valid; this gives the tag the option
         // to say, no, I'm broken, don't try to process me.
-        if (!this.doTag(BBAction.CHECK, tagName, tagParams['_default'] ? tagParams['_default'] : null, tagParams, "")) {
+        if (!this.doTag(BBAction.CHECK, tagName, tagParams['_default'] ? tagParams['_default'] : undefined, tagParams, "")) {
             if (this.debug) {
                 Debugger.debug("Internal_ParseStartTagToken:", `tag [${tagName}] rejected its parameters; outputting as text after fixup.`);
             }
@@ -1957,7 +1957,7 @@ export default class BBCode {
      */
     protected parseEndTagToken() {
         const tagParams = this.lexer.tag;
-        const tagName = tagParams['_name'] ? tagParams['_name'] : null;
+        const tagName = tagParams['_name'] ? tagParams['_name'] : undefined;
         if (this.debug) {
             Debugger.debug("Internal_ParseEndTagToken:",`got end tag [/${tagName}].`);
         }
@@ -1995,21 +1995,21 @@ export default class BBCode {
         if (this.tagRules[tagName] && this.tagRules[tagName]['before_tag']) {
             this.cleanupWSByPoppingStack(this.tagRules[tagName]['before_tag'], this.stack);
         } else {
-            this.cleanupWSByPoppingStack(null, this.stack);
+            this.cleanupWSByPoppingStack(undefined, this.stack);
         }
         startTagParams['_endtag'] = tagParams['_tag'];
         startTagParams['_hasend'] = true;
         const output = this.doTag(
             BBAction.OUTPUT,
             tagName,
-            startTagParams['_default'] ? startTagParams['_default'] : null,
+            startTagParams['_default'] ? startTagParams['_default'] : undefined,
             startTagParams,
             contents
         );
         if (this.tagRules[tagName]['after_endtag']) {
             this.cleanupWSByEatingInput(this.tagRules[tagName]['after_endtag']);
         } else {
-            this.cleanupWSByEatingInput(null);
+            this.cleanupWSByEatingInput(undefined);
         }
         if (this.debug) {
             Debugger.debug("Internal_ParseEndTagToken:", `end tag [/${tagName}] done; push output: ${output}`);
@@ -2030,7 +2030,7 @@ export default class BBCode {
      * @param string The BBCode string to parse.
      * @return Returns the HTML version of {@link string}.
      */
-    public parse(string: string): string {
+    public parse(string: string): string | undefined {
         if (!string) return undefined;
         if (this.debug) {
             Debugger.debug("Parse Begin:", `input string is ${string.length} characters long:"`);
@@ -2041,7 +2041,7 @@ export default class BBCode {
         // and not a character-by-character tokenizer, the structure of the input
         // must be known in advance, which is why the tag marker cannot be changed
         // during the parse.
-        this.lexer = new BBCodeLexer(string, this.tagMarker);
+        this.lexer = new BBCodeLexer(string, this.tagMarker, this.debug);
         this.lexer.debug = this.debug;
         // If we're fuzzily limiting the text length, see if we need to actually
         // cut it off, or if it's close enough to not be worth the effort.

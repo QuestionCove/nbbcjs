@@ -20,23 +20,32 @@ export interface StackType {
     [BBStack.CLASS]: ClassType
 }
 
-export interface TagType {
-    //Parser Types
+/**
+ * Private Tag Types for the parser
+ */
+export interface TagTypePrivate {
     _tag?: string,
     _endtag?: boolean | string,
     _name?: string,
     _hasend?: boolean,
     _end?: boolean,
-    _default?: boolean | string | null,
+    _default?: boolean | string,
     _params?: Param[],
-    //Tag Specific Types
-    title?: string | null,
+}
+
+/**
+ * Public TagTypes for extended tag processing
+ */
+export interface TagType extends TagTypePrivate {
+    title?: string,
     url?: string,
     target?: string,
     content?: string,
     email?: string,
     wikiURL?: string,
     name?: string,
+    date?: string,
+    [publictypes: string]: string | boolean | Param[] | undefined
 }
 
 export interface TagRules {

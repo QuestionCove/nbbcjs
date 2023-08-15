@@ -29,35 +29,35 @@ export default class BBCodeLexer {
      * @param string The string to be broken up into tokens.
      * @param tagMarker The BBCode tag marker.
      */
-    public constructor(string: string, tagMarker = '[') {
+    public constructor(string: string, tagMarker = '[', debug: boolean = false) {
         // First thing we do is to split the input string into tuples of
         // text and tags.  This will make it easy to tokenize.  We define a tag as
         // anything starting with a [, ending with a ], and containing no [ or ] in
         // between unless surrounded by "" or '', and containing no newlines.
         // We also separate out whitespace and newlines.
         // Choose a tag marker based on the possible tag markers.
-        const regexBeginMarkers = {
+        const regexBeginMarkers: Record<string, string> = {
             "[": "\\[",
             "<": "<",
             "{": "\\{",
             "(": "\\("
         };
-        const RegexEndMarkers = {
+        const regexEndMarkers: Record<string, string> = {
             "[": "\\]",
             "<": ">",
             "{": "\\}",
             "(": "\\)"
         };
-        const endMarkers = {
+        const endMarkers: Record<string, string> = {
             "[": "]",
             "<": ">",
             "{": "}",
             "(": ")"
         };
-        if (!RegexEndMarkers[tagMarker]) {
+        if (!regexEndMarkers[tagMarker]) {
             tagMarker = '[';
         }
-        const end = RegexEndMarkers[tagMarker];
+        const end = regexEndMarkers[tagMarker];
         const start = regexBeginMarkers[tagMarker];
         this.tagMarker = tagMarker;
         this.endTagMarker = endMarkers[tagMarker];
@@ -109,6 +109,7 @@ export default class BBCodeLexer {
         this.token = BBToken.EOI;
         this.tag = false;
         this.text = "";
+        this.debug = debug;
     }
     /**
      * Compute how many non-tag characters there are in the input, give or take a few.
@@ -280,7 +281,7 @@ export default class BBCodeLexer {
                     }
                     // See if this is a [[wiki link]]; if so, convert it into a [wiki="" title=""] tag.
                     if ((matches = this.text.match(this.patWiki))) {
-                        matches = {...{1: null, 2: null}, ...matches};
+                        matches = {...{1: undefined, 2: undefined}, ...matches};
                         this.tag = {
                             '_name': 'wiki',
                             '_endtag': false,
@@ -349,14 +350,14 @@ export default class BBCodeLexer {
             return;
         }
         lexState = {...{
-            'token': null,
-            'text': null,
-            'tag': null,
-            'state': null,
-            'input': null,
-            'ptr': null,
-            'unget': null,
-            'verbatim': null
+            'token': undefined,
+            'text': undefined,
+            'tag': undefined,
+            'state': undefined,
+            'input': undefined,
+            'ptr': undefined,
+            'unget': undefined,
+            'verbatim': undefined
         }, ...lexState};
         this.token = lexState['token'];
         this.text = lexState['text'];
