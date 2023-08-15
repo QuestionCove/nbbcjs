@@ -12,14 +12,11 @@ import method_exists from "../modules/method_exists";
 import { htmlEncode, htmlDecode } from '../modules/html_entities';
 import strip_tags from '../modules/strip_tags';
 import basename from '../modules/basename';
+import parse_url from "../modules/parse_url";
 
 //Types
 import { BBStack, BBToken, BBMode, BBType, BBAction, DebugLevel } from '../@types/enums';
 import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTypes";
-
-//PHP Methods
-//TODO: Replace all PHP methods with native JavaScript
-import parse_url from 'locutus/php/url/parse_url';
 
 export default class BBCode {
     /**
@@ -492,9 +489,10 @@ export default class BBCode {
      * @return Returns **true** if {@link string} is a valid URL or **false** otherwise.
      */
     public isValidURL(string: string, emailToo: boolean = true): boolean {
+        //string.match(/^[^:]+(?=:\/\/)/)[0]
         // Validate using PHP's fast filter method.
         if (filter_var(string, 'FILTER_VALIDATE_URL') !== false &&
-            ['http', 'https', 'ftp'].includes(parse_url(string, 'PHP_URL_SCHEME'))) {
+            ['http', 'https', 'ftp'].includes(parse_url(string)["scheme"])) {
             return true;
         }
         // Check for anything that does *not* have a colon in it before the first

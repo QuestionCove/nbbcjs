@@ -9,10 +9,7 @@ import { TagRules, TagType } from "../@types/dataTypes";
 import { htmlEncode } from '../modules/html_entities';
 import strip_tags from '../modules/strip_tags';
 import basename from '../modules/basename';
-
-//PHP Functions
-//TODO: Replace all PHP methods with native JavaScript
-import parse_url from "locutus/php/url/parse_url";
+import parse_url from "../modules/parse_url";
 
 export default class BBCodeLibrary {
     /**
