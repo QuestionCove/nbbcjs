@@ -83,9 +83,9 @@ jobs:
           asset_path: ./build/dist/nbbc.legacy.js.map
           asset_content_type: application/json
       - name: Upload Release Source Map
-          uses: actions/upload-release-asset@v1
-          with:
-            upload_url: ${{ github.event.release.upload_url }}
-            asset_name: ${{env.PACKAGE_NAME}}-${{env.PACKAGE_VERSION}}.legacy.min.js.map
-            asset_path: ./build/dist/nbbc.legacy.min.js.map
-            asset_content_type: application/json
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_name: ${{env.PACKAGE_NAME}}-${{env.PACKAGE_VERSION}}.legacy.min.js.map
+          asset_path: ./build/dist/nbbc.legacy.min.js.map
+          asset_content_type: application/json
