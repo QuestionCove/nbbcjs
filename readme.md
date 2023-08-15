@@ -34,10 +34,19 @@ In an NPM environment, you can install the library with:
 npm i nbbcjs
 ```
 
-Or if you are using this in a browser, include the javascript file by downloading it from the releases and including it, or using unpkg like so:
+Or if you are using this in a browser, we provide 4 prebuilt releases, nbbc.min.js, nbbc.js, nbbc.legacy.min.js, and nbbc.legacy.js.
+
+- *nbbc.min.js*: Minified version of the code for production
+- *nbbc.js*: Uncompressed version of the code for development
+- *nbbc.legacy.min.js*: Minified version of the code transpiled to allow for most browsers for production
+- *nbbc.legacy.js*: Uncompressed version of the transpiled code for development
+
+Each version comes with optional source maps.
+
+To use the prebuilt version, simply include the javascript file of your choice by downloading it from the releases and including it, or using unpkg:
 
 ```html
-<script src="https://www.unpkg.com/nbbcjs@latest/build/dist/nbbc.js"></script>
+<script src="https://www.unpkg.com/nbbcjs@latest/build/dist/nbbc.min.js"></script>
 ```
 
 After it's installed, refer to [Usage](#usage)
