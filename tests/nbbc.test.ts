@@ -103,7 +103,7 @@ const tests = {
         {
             descr: ":-) produces an emoji <img> element.",
             bbcode: "This is a test of the emergency broadcasting system :-)",
-            html: 'This is a test of the emergency broadcasting system <img src="emoji/smile.gif" alt=":-)" title=":-)" class="bbcode_emoji" />',
+            html: 'This is a test of the emergency broadcasting system <img src="emoji/smile.gif" alt=":-)" title=":-)" class="bbcode_emoji bbcode_smiley" />',
         },
         {
             descr: "--- does *not* produce a [rule] tag.",
@@ -706,7 +706,7 @@ const tests = {
         {
             descr: "Multiple nested [quote]...[/quote] tags should produce nested quotes.",
             bbcode: "[quote]\n[quote]\n[quote]text1[/quote]\ntext2[/quote]\ntext3[/quote]\ntext4 :) text5 :o text6 :o",
-            html: '\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">text1</div>\n</div>\ntext2</div>\n</div>\ntext3</div>\n</div>\ntext4 <img src="emoji/smile.gif" alt=":)" title=":)" class="bbcode_emoji" /> text5 :o text6 :o',
+            html: '\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">Quote:</div>\n<div class="bbcode_quote_body">text1</div>\n</div>\ntext2</div>\n</div>\ntext3</div>\n</div>\ntext4 <img src="emoji/smile.gif" alt=":)" title=":)" class="bbcode_emoji bbcode_smiley" /> text5 :o text6 :o',
         },
         {
             descr: "[quote=John]...[/quote] should produce a quote from John.",
