@@ -13,7 +13,6 @@ module.exports = [{
                         "@babel/typescript",
                         ['@babel/preset-env', {
                             targets: "defaults"
-                            //TODO: Look into creating a seperate legacy build with `targets: "> 0.25%, not dead"`
                         }]
                     ]
                 }
@@ -52,7 +51,6 @@ module.exports = [{
                         "@babel/typescript",
                         ['@babel/preset-env', {
                             targets: "defaults"
-                            //TODO: Look into creating a seperate legacy build with `targets: "> 0.25%, not dead"`
                         }]
                     ]
                 }
