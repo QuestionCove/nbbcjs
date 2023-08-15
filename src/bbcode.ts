@@ -628,7 +628,7 @@ export default class BBCode {
                         const alt = htmlEncode(token);
                         if (emojiCount < this.maxEmoji || this.maxEmoji < 0) {
                             output += "<img src=\""+htmlEncode(this.emojiUrl+'/'+this.emoji[token])+'"'
-                                +` alt="${alt}" title="${alt}" class="bbcode_emoji" />`;
+                                +` alt="${alt}" title="${alt}" class="bbcode_emoji bbcode_smiley" />`;
                         } else {
                             output += token;
                         }
