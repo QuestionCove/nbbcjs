@@ -6,7 +6,18 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: 'ts-loader',
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            "@babel/typescript",
+                            ['@babel/preset-env', {
+                                targets: "defaults"
+                                //TODO: Look into creating a seperate legacy build with `targets: "> 0.25%, not dead"`
+                            }]
+                        ]
+                    }
+                },
                 exclude: /node_modules/,
             },
         ],
