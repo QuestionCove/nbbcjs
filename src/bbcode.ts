@@ -504,7 +504,7 @@ export default class BBCode {
             return true;
         }
         // Match mail addresses.
-        if (emailToo && string.slice(0, 7) == "mailto:") {
+        if (emailToo && string.slice(0, 7) === "mailto:") {
             return this.isValidEmail(string.slice(7));
         }
         return false;
@@ -869,7 +869,7 @@ export default class BBCode {
                 if (matches[2]) {
                     // We have one or more indexes, so break them apart and look up the requested data.
                     for (const index of matches[2].slice(1).split(".")) {
-                        if (typeof value == "object") {
+                        if (typeof value === "object") {
                             value = value[index] ? value[index] : undefined;
                         } else {
                             value = '';
@@ -979,7 +979,7 @@ export default class BBCode {
         let output: StackType[] = [];
         while (this.stack.length > pos) {
             const token = this.stack.pop();
-            if (token[BBStack.TOKEN] != BBToken.TAG) {
+            if (token[BBStack.TOKEN] !== BBToken.TAG) {
                 // Not a tag, so just push it to the output.
                 output.push(token);
                 if (this.debug)
@@ -1006,7 +1006,7 @@ export default class BBCode {
                 }, ...rule};
                 const endTag = rule['end_tag'];
                 this.startTags[name].pop(); // Remove the locator for this tag.
-                if (endTag == BBType.PROHIBIT) {
+                if (endTag === BBType.PROHIBIT) {
                     // Broken tag, so just push it to the output as HTML.
                     output.push({
                         [BBStack.TOKEN]: BBToken.TEXT,
@@ -1024,7 +1024,7 @@ export default class BBCode {
                         Debugger.debug("Internal_GenerateOutput: found start tag with optional end tag:", token[BBStack.TEXT]);
                     // If this was supposed to have an end tag, and we find a floating one
                     // later on, then we should consume it.
-                    if (endTag == BBType.REQUIRED) {
+                    if (endTag === BBType.REQUIRED) {
                         if (!this.lostStartTags[name]) {
                             this.lostStartTags[name] = 0;
                         }
@@ -1252,15 +1252,15 @@ export default class BBCode {
         for (const char of pattern.split('')) {
             switch (char) {
             case 's':
-                while (array.length > 0 && array[array.length - 1][BBStack.TOKEN] == BBToken.WS)
+                while (array.length > 0 && array[array.length - 1][BBStack.TOKEN] === BBToken.WS)
                     array.pop();
                 break;
             case 'n':
-                if (array.length > 0 && array[array.length - 1][BBStack.TOKEN] == BBToken.NL)
+                if (array.length > 0 && array[array.length - 1][BBStack.TOKEN] === BBToken.NL)
                     array.pop();
                 break;
             case 'a':
-                while (array.length > 0 && ((token = array[array.length - 1][BBStack.TOKEN]) == BBToken.WS || token == BBToken.NL))
+                while (array.length > 0 && ((token = array[array.length - 1][BBStack.TOKEN]) === BBToken.WS || token === BBToken.NL))
                     array.pop();
                 break;
             }
@@ -1269,7 +1269,7 @@ export default class BBCode {
             Debugger.debug("Internal_CleanupWSByPoppingStack:", `array now has ${array.length} items`);
             Debugger.debug("Internal_CleanupWSByPoppingStack: array:", this.dumpStack(array));
         }
-        if (array.length != oldlen) {
+        if (array.length !== oldlen) {
             // We only recompute the class if something actually changed.
             this.computeCurrentClass();
         }
@@ -1286,19 +1286,19 @@ export default class BBCode {
             switch (char) {
             case 's':
                 tokenType = this.lexer.nextToken();
-                while (tokenType == BBToken.WS) {
+                while (tokenType === BBToken.WS) {
                     tokenType = this.lexer.nextToken();
                 }
                 this.lexer.ungetToken();
                 break;
             case 'n':
                 tokenType = this.lexer.nextToken();
-                if (tokenType != BBToken.NL)
+                if (tokenType !== BBToken.NL)
                     this.lexer.ungetToken();
                 break;
             case 'a':
                 tokenType = this.lexer.nextToken();
-                while (tokenType == BBToken.WS || tokenType == BBToken.NL) {
+                while (tokenType === BBToken.WS || tokenType === BBToken.NL) {
                     tokenType = this.lexer.nextToken();
                 }
                 this.lexer.ungetToken();
@@ -1320,15 +1320,15 @@ export default class BBCode {
         for (const char of pattern.split('')) {
             switch (char) {
             case 's':
-                while (pos < array.length && array[pos][BBStack.TOKEN] == BBToken.WS)
+                while (pos < array.length && array[pos][BBStack.TOKEN] === BBToken.WS)
                     pos++;
                 break;
             case 'n':
-                if (pos < array.length && array[pos][BBStack.TOKEN] == BBToken.NL)
+                if (pos < array.length && array[pos][BBStack.TOKEN] === BBToken.NL)
                     pos++;
                 break;
             case 'a':
-                while (pos < array.length && ((token = array[pos][BBStack.TOKEN]) == BBToken.WS || token == BBToken.NL))
+                while (pos < array.length && ((token = array[pos][BBStack.TOKEN]) === BBToken.WS || token === BBToken.NL))
                     pos++;
                 break;
             }
@@ -1408,9 +1408,9 @@ export default class BBCode {
                 // An 'allow' array, if given, overrides the other check techniques.
                 for (const param in tagRule['allow']) {
                     const pattern = tagRule['allow'][param];
-                    if (param == '_content') {
+                    if (param === '_content') {
                         value = contents;
-                    } else if (param == '_defaultcontent') {
+                    } else if (param === '_defaultcontent') {
                         if (defaultValue) {
                             value = defaultValue;
                         } else {
@@ -1431,7 +1431,7 @@ export default class BBCode {
                         Debugger.debug("<b>DoTag:", `check parameter "${param}", value "${value}", against "${pattern}"`);
                     }
                     //TODO: Fix below
-                    if (!(typeof value == "string" && value.match(pattern.slice(1,-1)))) {
+                    if (!(typeof value === "string" && value.match(pattern.slice(1,-1)))) {
                         if (this.debug) 
                             Debugger.debug("DoTag:", `parameter "${param}" failed 'allow' check."`);
                         
@@ -1452,7 +1452,7 @@ export default class BBCode {
                     result = true;
                     break;
                 case BBMode.INTERNAL:
-                    if (typeof this[tagRule['method']] == "function") {
+                    if (typeof this[tagRule['method']] === "function") {
                         try {
                             result = this[tagRule['method']](BBAction.CHECK, tagName, defaultValue, params, contents);
                         } catch(error) {
@@ -1465,7 +1465,7 @@ export default class BBCode {
                     }
                     break;
                 case BBMode.LIBRARY:
-                    if (typeof this.defaults[tagRule['method']] == "function") {
+                    if (typeof this.defaults[tagRule['method']] === "function") {
                         try {
                             result = this.defaults[tagRule['method']](this, BBAction.CHECK, tagName, defaultValue, params, contents);
                         } catch(error) {
@@ -1478,7 +1478,7 @@ export default class BBCode {
                     }
                     break;
                 case BBMode.CALLBACK:
-                    if (typeof tagRule['callback'] == "function" && typeof params == "object") {
+                    if (typeof tagRule['callback'] === "function" && typeof params === "object") {
                         try {
                             result = tagRule['callback'](this, BBAction.OUTPUT, tagName, defaultValue, params, contents);
                         } catch(error) {
@@ -1511,7 +1511,7 @@ export default class BBCode {
                     // Find the requested content, in the order specified.
                 result = possibleContent = "";
                 for (const possibleContent of plainContent) {
-                    if (possibleContent == '_content' && contents) {
+                    if (possibleContent === '_content' && contents) {
                         result = contents;
                         break;
                     }
@@ -1534,7 +1534,7 @@ export default class BBCode {
                     // Find the requested link target, in the order specified.
                     link = possibleContent = "";
                     for (const possibleContent of tagRule['plain_link']) {
-                        if (possibleContent == '_content' && contents) {
+                        if (possibleContent === '_content' && contents) {
                             link = this.unHTMLEncode(strip_tags(contents));
                             break;
                         }
@@ -1581,7 +1581,7 @@ export default class BBCode {
                 }
                 break;
             case BBMode.CALLBACK:
-                if (typeof tagRule['callback'] == "function" && typeof params == "object") {
+                if (typeof tagRule['callback'] === "function" && typeof params === "object") {
                     try {
                         result = tagRule['callback'](this, BBAction.OUTPUT, tagName, defaultValue, params, contents);
                     } catch(error) {
@@ -1722,8 +1722,8 @@ export default class BBCode {
         const start = this.stack.length;
         this.lexer.verbatim = true;
         let tokenType: BBToken, newstart, endTagParams;
-        while ((tokenType = this.lexer.nextToken()) != BBToken.EOI) {
-            if (this.lexer.text.toLowerCase() == endTag.toLowerCase()) {
+        while ((tokenType = this.lexer.nextToken()) !== BBToken.EOI) {
+            if (this.lexer.text.toLowerCase() === endTag.toLowerCase()) {
                 // Found the end tag, so we're done.
                 endTagParams = endTag;
                 break;
@@ -1758,7 +1758,7 @@ export default class BBCode {
         this.lexer.verbatim = false;
         // We've collected a bunch of text for this tag.  Now, make sure it ended on
         // a valid end tag.
-        if (tokenType == BBToken.EOI) {
+        if (tokenType === BBToken.EOI) {
             // No end tag, so we have to reject the start tag as broken, and
             // rewind the input back to where it was still sane.
             if (this.debug) {
@@ -1903,7 +1903,7 @@ export default class BBCode {
         // right now (no content); otherwise, we push it onto the stack to defer
         // processing it until either its end tag is encountered or we reach EOI.
         const endTag = tagRule['end_tag'] ? tagRule['end_tag'] : BBType.REQUIRED;
-        if (endTag == BBType.PROHIBIT) {
+        if (endTag === BBType.PROHIBIT) {
             // No end tag, so process this tag RIGHT NOW.
             this.processIsolatedTag(tagName, tagParams, tagRule);
             return;
@@ -1927,7 +1927,7 @@ export default class BBCode {
             });
             return;
         }
-        if (tagRule['content'] && tagRule['content'] == BBType.VERBATIM) {
+        if (tagRule['content'] && tagRule['content'] === BBType.VERBATIM) {
             // Verbatim tags have to be handled specially, since they consume successive
             // input immediately.
             this.processVerbatimTag(tagName, tagParams, tagRule);
@@ -2099,7 +2099,7 @@ export default class BBCode {
         // keep the text/whitespace/newline code here for performance reasons.
         while (true) {
             let tokenType: BBToken;
-            if ((tokenType = this.lexer.nextToken()) == BBToken.EOI) {
+            if ((tokenType = this.lexer.nextToken()) === BBToken.EOI) {
                 break;
             }
             if (this.debug)

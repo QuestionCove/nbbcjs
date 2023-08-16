@@ -127,7 +127,7 @@ export default class BBCodeLexer {
         // Loop until we find a valid (nonempty) token.
         while (ptr < this.input.length) {
             const text = this.input[ptr++];
-            if (state == LexState.TEXT) {
+            if (state === LexState.TEXT) {
                 state = LexState.TAG;
                 length += text.length;
             } else {
@@ -192,7 +192,7 @@ export default class BBCodeLexer {
                 // In verbatim mode, we return *everything* as plain text or whitespace.
                 this.tag = false;
                 let tokenType: BBToken;
-                if (this.state == LexState.TEXT) {
+                if (this.state === LexState.TEXT) {
                     this.state = LexState.TAG;
                     tokenType = BBToken.TEXT;
                 } else {
@@ -221,7 +221,7 @@ export default class BBCodeLexer {
                 if (this.text.length > 0) {
                     return this.token = tokenType;
                 }
-            } else if (this.state == LexState.TEXT) {
+            } else if (this.state === LexState.TEXT) {
                 // Next up is plain text, but only return it if it's nonempty.
                 this.state = LexState.TAG;
                 this.tag = false;
@@ -346,7 +346,7 @@ export default class BBCodeLexer {
      * @param lexState The previous lexer state.
      */
     public restoreState(lexState: State) {
-        if (!(typeof lexState == "object")) {
+        if (!(typeof lexState === "object")) {
             return;
         }
         lexState = {...{
@@ -404,7 +404,7 @@ export default class BBCodeLexer {
             return -1; // EOI.
         }
         const piece = pieces[ptr];
-        if (piece == '=') {
+        if (piece === '=') {
             return '=';
         } else if (/^['"]/.test(piece)) {
             return '"';
@@ -454,24 +454,24 @@ export default class BBCodeLexer {
             result['_end'] = false;
         }
         // Skip whitespace after the tag name.
-        while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+        while ((type = this.classifyPiece(ptr, pieces)) === ' ') {
             ptr++;
         }
         const params: Param[] = [];
         let value;
         // If the next piece is an equal sign, then the tag's default value follows.
-        if (type != '=') {
+        if (type !== '=') {
             result['_default'] = false;
             params.push({'key': '', 'value': ''});
         } else {
             ptr++;
             // Skip whitespace after the initial equal-sign.
-            while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+            while ((type = this.classifyPiece(ptr, pieces)) === ' ') {
                 ptr++;
             }
             // Examine the next (real) piece, and see if it's quoted; if not, we need to
             // use heuristics to guess where the default value begins and ends.
-            if (type == "\"") {
+            if (type === "\"") {
                 value = this.stripQuotes(pieces[ptr++]);
             } else {
                 // Collect pieces going forward until we reach an = sign or the end of the
@@ -484,38 +484,38 @@ export default class BBCodeLexer {
                 // to behave in a way that makes (tolerable) sense.
                 let afterSpace = false;
                 let start = ptr;
-                while ((type = this.classifyPiece(ptr, pieces)) != -1) {
-                    if (type == ' ') {
+                while ((type = this.classifyPiece(ptr, pieces)) !== -1) {
+                    if (type === ' ') {
                         afterSpace = true;
                     }
-                    if (type == '=' && afterSpace) {
+                    if (type === '=' && afterSpace) {
                         break;
                     }
                     ptr++;
                 }
-                if (type == -1) {
+                if (type === -1) {
                     ptr--;
                 }
                 // We've now found the first (appropriate) equal-sign after the start of the
                 // default value.  (In the example above, that's the "=" after "target"+)  We
                 // now have to rewind back to the last whitespace to find where the default
                 // value ended.
-                if (type == '=') {
+                if (type === '=') {
                     // Rewind before = sign.
                     ptr--;
                     // Rewind before any whitespace before = sign.
-                    while (ptr > start && this.classifyPiece(ptr, pieces) == ' ') {
+                    while (ptr > start && this.classifyPiece(ptr, pieces) === ' ') {
                         ptr--;
                     }
                     // Rewind before any text elements before that.
-                    while (ptr > start && this.classifyPiece(ptr, pieces) != ' ') {
+                    while (ptr > start && this.classifyPiece(ptr, pieces) !== ' ') {
                         ptr--;
                     }
                 }
                 // The default value is everything from `start` to `ptr`, inclusive.
                 value = "";
                 for (; start <= ptr; start++) {
-                    if (this.classifyPiece(start, pieces) == ' ') {
+                    if (this.classifyPiece(start, pieces) === ' ') {
                         value += " ";
                     } else {
                         value += this.stripQuotes(pieces[start]);
@@ -530,7 +530,7 @@ export default class BBCodeLexer {
         // The rest of the tag is composed of either floating keys or key=value pairs, so walk through
         // the tag and collect them all.  Again, we have the nasty special case where an equal sign
         // in a parameter but before whitespace counts as part of that parameter.
-        while ((type = this.classifyPiece(ptr, pieces)) != -1) {
+        while ((type = this.classifyPiece(ptr, pieces)) !== -1) {
             let key = '';
             // Skip whitespace before the next key name.
             while (type === ' ') {
@@ -552,7 +552,7 @@ export default class BBCodeLexer {
                 break;
             }
             // Skip whitespace after the key name.
-            while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+            while ((type = this.classifyPiece(ptr, pieces)) === ' ') {
                 ptr++;
             }
             // If an equal-sign follows, we need to collect a value.  Otherwise, we
@@ -562,7 +562,7 @@ export default class BBCodeLexer {
             } else {
                 ptr++;
                 // Skip whitespace after the equal sign.
-                while ((type = this.classifyPiece(ptr, pieces)) == ' ') {
+                while ((type = this.classifyPiece(ptr, pieces)) === ' ') {
                     ptr++;
                 }
                 if (type === '"') {
@@ -572,8 +572,8 @@ export default class BBCodeLexer {
                     // If we get a non-quoted value, consume non-quoted values
                     // until we reach whitespace.
                     value = pieces[ptr++];
-                    while ((type = this.classifyPiece(ptr, pieces)) != -1
-                        && type != ' ') {
+                    while ((type = this.classifyPiece(ptr, pieces)) !== -1
+                        && type !== ' ') {
                         value += pieces[ptr++];
                     }
                 } else {

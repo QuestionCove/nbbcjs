@@ -430,11 +430,11 @@ export default class BBCodeLibrary {
     public doURL(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | true {
         // We can't check this with BBCODE_CHECK because we may have no URL
         // before the content has been processed.
-        if (action == BBAction.CHECK) {
+        if (action === BBAction.CHECK) {
             return true;
         }
         let target = '';
-        const url = typeof defaultValue == "string"
+        const url = typeof defaultValue === "string"
             ? defaultValue
             : bbcode.unHTMLEncode(strip_tags(content));
         if (bbcode.isValidURL(url)) {
@@ -472,10 +472,10 @@ export default class BBCodeLibrary {
     public doEmail(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | true {
         // We can't check this with BBCODE_CHECK because we may have no URL
         // before the content has been processed.
-        if (action == BBAction.CHECK) {
+        if (action === BBAction.CHECK) {
             return true;
         }
-        const email = typeof defaultValue == "string"
+        const email = typeof defaultValue === "string"
             ? defaultValue
             : bbcode.unHTMLEncode(strip_tags(content));
         if (bbcode.isValidEmail(email)) {
@@ -591,7 +591,7 @@ export default class BBCodeLibrary {
     public doWiki(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | boolean {
         let title;
         name = bbcode.wikify(defaultValue);
-        if (action == BBAction.CHECK) {
+        if (action === BBAction.CHECK) {
             return name.length > 0;
         }
         if (params['title'] && params['title'].length) {
@@ -615,7 +615,7 @@ export default class BBCodeLibrary {
      */
     public doImage(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): string | true {
         // We can't validate this until we have its content.
-        if (action == BBAction.CHECK) {
+        if (action === BBAction.CHECK) {
             return true;
         }
         content = bbcode.unHTMLEncode(strip_tags(content)).trim();
@@ -623,7 +623,7 @@ export default class BBCodeLibrary {
             content = defaultValue;
         }
         const urlParts = parse_url(content) as Record<string, string>;
-        if (typeof urlParts == "object") {
+        if (typeof urlParts === "object") {
             if (urlParts['path'] &&
                !urlParts['scheme'] &&
                !/^.{0,2}\//.test(urlParts['path']) &&
@@ -655,7 +655,7 @@ export default class BBCodeLibrary {
      * @return Returns the rule HTML or **true** if {@link action} is **BBAction.BBCODE_CHECK**.
      */
     public doRule(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): boolean | string {
-        if (action == BBAction.CHECK) {
+        if (action === BBAction.CHECK) {
             return true;
         } else {
             return bbcode.getRuleHTML();
@@ -691,7 +691,7 @@ export default class BBCodeLibrary {
      * @return Returns the quote HTML or **true** if {@link action} is **BBAction.BBCODE_CHECK**.
      */
     public doQuote(bbcode: BBCode, action: BBAction, name: string, defaultValue: string, params: TagType, content: string): boolean | string {
-        if (action == BBAction.CHECK) {
+        if (action === BBAction.CHECK) {
             return true;
         }
         let title;
@@ -768,8 +768,8 @@ export default class BBCodeLibrary {
             "square": "square"
         };
         defaultValue = defaultValue ? defaultValue.trim() : undefined;
-        if (action == BBAction.CHECK) {
-            if (!(typeof defaultValue == "string")) {
+        if (action === BBAction.CHECK) {
+            if (!(typeof defaultValue === "string")) {
                 return true;
             } else if (listStyles[defaultValue]) {
                 return true;
@@ -781,10 +781,10 @@ export default class BBCodeLibrary {
         }
         // Choose a list element (<ul> or <ol>) and a style.
         let elem: string, type: string;
-        if (!(typeof defaultValue == "string")) {
+        if (!(typeof defaultValue === "string")) {
             elem = 'ul';
             type = '';
-        } else if (defaultValue == '1') {
+        } else if (defaultValue === '1') {
             elem = 'ol';
             type = '';
         } else if (listStyles[defaultValue]) {
