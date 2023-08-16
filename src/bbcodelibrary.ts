@@ -564,12 +564,12 @@ export default class BBCodeLibrary {
         for (let font of fonts) {
             font = font.trim();
             if (specialFonts[font]) {
-                if (result.length > 0) {
+                if (result) {
                     result += ",";
                 }
                 result += specialFonts[font];
-            } else if (font.length > 0) {
-                if (result.length > 0) {
+            } else if (font) {
+                if (result) {
                     result += ",";
                 }
                 result += `'${font}'`;

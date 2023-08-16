@@ -573,7 +573,7 @@ export default class BBCode {
             // did you?)
             const chunks = this.autoDetectURLs(string);
             output = [];
-            if (chunks.length) {
+            if (chunks) {
                 let isURL = false;
                 for (const chunk of chunks) {
                     let usechunk = chunk;
@@ -612,7 +612,7 @@ export default class BBCode {
             }
             // Split the string so that it consists of alternating pairs of emoji and non-emoji.
             const tokens = preg_split(this.emojiRegex, string, -1, PREG_SPLIT_DELIM_CAPTURE);
-            if (tokens.length <= 1) {
+            if (!tokens) {
                 // Special (common) case:  This skips the emoji constructor if there
                 // were no emoji found, which is most of the time.
                 output = this.htmlEncode(string);
@@ -841,7 +841,7 @@ export default class BBCode {
     public fillTemplate(template: string, inserts: boolean | TagType, defaults: Record<string, string> = {}) {
         const pieces = template.split(/(\{\$[a-zA-Z0-9_.:/-]+\})/);
         // Special (common) high-speed case:  No inserts found in the template.
-        if (pieces.length <= 1)
+        if (!pieces)
             return template;
         const result = [];
         let isInsert = false;
@@ -1128,7 +1128,7 @@ export default class BBCode {
         let pos, newpos, newend;
         // If this is a malformed tag like [/], tell them now, since there's
         // no way we can possibly match it.
-        if (!tagName || tagName.length <= 0)
+        if (!tagName)
             return false;
         // This is where we *would* walk backward from the top of the stack, searching
         // for the matching start tag for this end tag.  But since we record the
@@ -1359,7 +1359,7 @@ export default class BBCode {
     // set the we-hit-the-limit flag, and return.
     protected doLimit() {
         this.cleanupWSByPoppingStack("a", this.stack);
-        if (this.limitTail.length > 0) {
+        if (this.limitTail) {
             this.stack.push({
                 [BBStack.TOKEN]: BBToken.TEXT,
                 [BBStack.TEXT]: this.limitTail,
@@ -1508,7 +1508,7 @@ export default class BBCode {
                     // Find the requested content, in the order specified.
                 result = possibleContent = "";
                 for (const possibleContent of plainContent) {
-                    if (possibleContent == '_content' && contents.length > 0) {
+                    if (possibleContent == '_content' && contents) {
                         result = contents;
                         break;
                     }
@@ -1531,7 +1531,7 @@ export default class BBCode {
                     // Find the requested link target, in the order specified.
                     link = possibleContent = "";
                     for (const possibleContent of tagRule['plain_link']) {
-                        if (possibleContent == '_content' && contents.length > 0) {
+                        if (possibleContent == '_content' && contents) {
                             link = this.unHTMLEncode(strip_tags(contents));
                             break;
                         }
@@ -1718,7 +1718,7 @@ export default class BBCode {
         // Push tokens until we find a matching end tag or end-of-input.
         const start = this.stack.length;
         this.lexer.verbatim = true;
-        let tokenType: BBToken, newstart, endTagParams, text;
+        let tokenType: BBToken, newstart, endTagParams;
         while ((tokenType = this.lexer.nextToken()) != BBToken.EOI) {
             if (this.lexer.text.toLowerCase() == endTag.toLowerCase()) {
                 // Found the end tag, so we're done.
@@ -1731,8 +1731,8 @@ export default class BBCode {
             // If this token pushes us past the output limit, split it up on a whitespace
             // boundary, add as much as we can, and then abort.
             if (this.outputLimit > 0 && this.textLength + this.lexer.text.length >= this.outputLimit) {
-                text = this.limitText(this.lexer.text, this.outputLimit - this.textLength);
-                if (text.length > 0) {
+                const text = this.limitText(this.lexer.text, this.outputLimit - this.textLength);
+                if (text) {
                     this.textLength += text.length;
                     this.stack.push({
                         [BBStack.TOKEN]: BBToken.TEXT,
@@ -2085,7 +2085,7 @@ export default class BBCode {
         this.textLength = 0;
         this.wasLimited = false;
         // Remove any initial whitespace in pre-trim mode.
-        if (this.preTrim.length > 0)
+        if (this.preTrim)
             this.cleanupWSByEatingInput(this.preTrim);
         // In plain mode, we generate newlines instead of <br> tags.
         const newline = this.plainMode ? "\n" : "<br>\n";
@@ -2110,7 +2110,7 @@ export default class BBCode {
                 // boundary, add as much as we can, and then abort.
                 if (this.outputLimit > 0 && this.textLength + this.lexer.text.length >= this.outputLimit) {
                     const text = this.limitText(this.lexer.text, this.outputLimit - this.textLength);
-                    if (text.length > 0) {
+                    if (text) {
                         this.textLength += text.length;
                         this.stack.push({
                             [BBStack.TOKEN]: BBToken.TEXT,
@@ -2215,7 +2215,7 @@ export default class BBCode {
         if (this.debug)
             Debugger.debug("Parse Done:", "done main parse; packing stack as text string.");
         // Remove any trailing whitespace in post-trim mode.
-        if (this.postTrim.length > 0)
+        if (this.postTrim)
             this.cleanupWSByPoppingStack(this.postTrim, this.stack);
         // Everything left on the stack should be HTML (or broken tags), so pop it
         // all off as plain text, concatenate it, and return it.
