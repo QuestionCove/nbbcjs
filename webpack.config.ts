@@ -1,4 +1,6 @@
-module.exports = [{
+import webpack from 'webpack';
+
+const config: webpack.Configuration[] = [{
     name: 'full',
     mode: 'production',
     devtool: 'source-map',
@@ -18,7 +20,7 @@ module.exports = [{
                 }
             },
             exclude: /node_modules/,
-        }, ],
+        }],
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json'],
@@ -56,7 +58,7 @@ module.exports = [{
                 }
             },
             exclude: /node_modules/,
-        }, ],
+        }],
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json'],
@@ -91,7 +93,7 @@ module.exports = [{
                 }
             },
             exclude: /node_modules/,
-        }, ],
+        }],
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json'],
@@ -129,7 +131,7 @@ module.exports = [{
                 }
             },
             exclude: /node_modules/,
-        }, ],
+        }],
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json'],
@@ -145,3 +147,5 @@ module.exports = [{
         }
     }
 }];
+
+export default config;
