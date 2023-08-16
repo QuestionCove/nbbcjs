@@ -106,6 +106,16 @@ const tests = {
             html: 'This is a test of the emergency broadcasting system <img src="emoji/smile.gif" alt=":-)" title=":-)" class="bbcode_emoji bbcode_smiley" />',
         },
         {
+            'descr': "Single quotes in tags are NOT considered special characters.",
+            'bbcode': "[wiki='foo' title='bar']",
+            'html': "<a href=\"/?page=foo\" class=\"bbcode_wiki\">bar</a>",
+        },
+        {
+            'descr': "Double quotes in tags are NOT considered special characters.",
+            'bbcode': "[wiki=\"foo\" title=\"bar\"]",
+            'html': "<a href=\"/?page=foo\" class=\"bbcode_wiki\">bar</a>",
+        },
+        {
             descr: "--- does *not* produce a [rule] tag.",
             bbcode: "This is a test of the --- emergency broadcasting system.",
             html: "This is a test of the --- emergency broadcasting system.",
