@@ -1441,7 +1441,7 @@ export default class BBCode {
                 return true;
             }
             result = true;
-            if (tagRule['mode']) {
+            if (typeof tagRule['mode'] !== "undefined") {
                 tagRule = {...{'method': ''}, ...tagRule};
                 switch (tagRule['mode']) {
                 default:
@@ -1915,7 +1915,7 @@ export default class BBCode {
         }
         // Ask this tag if its attributes are valid; this gives the tag the option
         // to say, no, I'm broken, don't try to process me.
-        if (!this.doTag(BBAction.CHECK, tagName, tagParams['_default'] ? tagParams['_default'] : undefined, tagParams, "")) {
+        if (!this.doTag(BBAction.CHECK, tagName, typeof tagParams['_default'] !== "undefined" ? tagParams['_default'] : undefined, tagParams, "")) {
             if (this.debug) {
                 Debugger.debug("Internal_ParseStartTagToken:", `tag [${tagName}] rejected its parameters; outputting as text after fixup.`);
             }
