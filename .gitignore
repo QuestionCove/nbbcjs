@@ -5,3 +5,4 @@ node_modules
 *.txt
 coverage
 nbbc_test.ts
+docs

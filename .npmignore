@@ -7,3 +7,4 @@ nbbc_test.ts
 .github
 jest.config.json
 tests
+docs
