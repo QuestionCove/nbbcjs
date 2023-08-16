@@ -10,7 +10,7 @@ import preg_split, {PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY} from "../modu
 export default class BBCodeLexer {
     public token: BBToken;         // Return token type:  One of the BBCODE_* constants.
     public text: string;           // Actual exact, original text of token.
-    public tag: TagType | boolean;   // If token is a tag, this is the decoded array version.
+    public tag: TagType | boolean; // If token is a tag, this is the decoded array version.
     public state: LexState;        // Next state of the lexer's state machine: text, or tag/ws/nl
     public input: string[];        // The input string, split into an array of tokens.
     public ptr: number;            // Read pointer into the input array.
@@ -19,7 +19,7 @@ export default class BBCodeLexer {
     public debug: boolean;         // In debug mode, we dump decoded tags when we find them.
     public tagMarker: string;      // Which kind of tag marker we're using:  "[", "<", "(", or "{"
     public endTagMarker: string;   // The ending tag marker:  "]", ">", "(", or "{"
-    public patMain: string | RegExp; // Main tag-matching pattern.
+    public patMain: string|RegExp; // Main tag-matching pattern.
     public patComment: RegExp;     // Pattern for matching comments.
     public patComment2: RegExp;    // Pattern for matching comments.
     public patWiki: RegExp;        // Pattern for matching wiki-links.

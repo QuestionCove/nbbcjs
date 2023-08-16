@@ -29,12 +29,12 @@ export default class BBCode {
     //-----------------------------------------------------------------------------
     // Instance variables.  Do not change any of these directly!  Use the
     // access methods provided below.
-    protected tagRules: Record<string, TagRules>;  // List of tag rules currently in use.
+    protected tagRules: Record<string, TagRules>;// List of tag rules currently in use.
     protected defaults: BBCodeLibrary;     // The standard library (an instance of class BBCodeLibrary).
     protected currentClass: ClassType;     // The current class (auto-computed).
     protected rootClass: ClassType;        // The root container class.
-    protected lostStartTags: Record<string, number>;     // For repair when tags are badly mis-nested.
-    protected startTags: Record<string, number[]>;         // An associative array of locations of start tags on the stack.
+    protected lostStartTags: Record<string, number>;// For repair when tags are badly mis-nested.
+    protected startTags: Record<string, number[]>;// An associative array of locations of start tags on the stack.
     protected allowAmpersand: boolean;     // If true, we use String.replaceAll() instead of htmlEncode().
     protected tagMarker: string;           // Set to '[', '<', '{', or '('.
     protected ignoreNewlines;              // If true, newlines will be treated as normal whitespace.
@@ -64,10 +64,10 @@ export default class BBCode {
     protected preTrim: string;             // How to trim the whitespace at the start of the input.
     protected postTrim: string;            // How to trim the whitespace at the end of the input.
     public debug: boolean;                 // Enable debugging mode
-    protected maxEmoji: number;          // Maximum number of emoji that can be used in parse
+    protected maxEmoji: number;            // Maximum number of emoji that can be used in parse
     protected escapeContent: boolean;      // Encode HTML. POTENTIALLY DANGEROUS IF DISABLED. ONLY DISABLE IF YOU KNOW WHAT YOURE DOING.
-    protected stack: StackType[];
-    protected lexer: BBCodeLexer;
+    protected stack: StackType[];          // The token stack is used to perform a document-tree walk
+    protected lexer: BBCodeLexer;          // BBCodeLexer created when calling parse
     /**
      * Initialize a new instance of the {@link BBCode} class.
      *
