@@ -144,8 +144,12 @@ export default class BBCode {
     public getRoot() {
         return this.rootClass;
     }
-    public setDebug(enable = true) {
+    public setDebug(enable: boolean = true) {
         this.debug = enable;
+        if (this.debug) 
+            Debugger.level = DebugLevel.all;
+        else 
+            Debugger.level = DebugLevel.error;
         return this;
     }
     public getDebug() {
