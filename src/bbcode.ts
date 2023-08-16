@@ -8,7 +8,6 @@ import {version} from '../package.json';
 //Modules
 import preg_split, { PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY } from "../modules/preg_split";
 import filter_var from "../modules/filter_var";
-import method_exists from "../modules/method_exists";
 import { htmlEncode, htmlDecode } from '../modules/html_entities';
 import strip_tags from '../modules/strip_tags';
 import basename from '../modules/basename';
@@ -1449,7 +1448,7 @@ export default class BBCode {
                     result = true;
                     break;
                 case BBMode.INTERNAL:
-                    if (method_exists(this, tagRule['method'])) {
+                    if (typeof this[tagRule['method']] == "function") {
                         try {
                             result = this[tagRule['method']](BBAction.CHECK, tagName, defaultValue, params, contents);
                         } catch(error) {
@@ -1462,7 +1461,7 @@ export default class BBCode {
                     }
                     break;
                 case BBMode.LIBRARY:
-                    if (method_exists(this.defaults, tagRule['method'])) {
+                    if (typeof this.defaults[tagRule['method']] == "function") {
                         try {
                             result = this.defaults[tagRule['method']](this, BBAction.CHECK, tagName, defaultValue, params, contents);
                         } catch(error) {
