@@ -34,7 +34,7 @@ export default class BBCode {
     protected currentClass: ClassType;     // The current class (auto-computed).
     protected rootClass: ClassType;        // The root container class.
     protected lostStartTags: Record<string, number>;     // For repair when tags are badly mis-nested.
-    protected startTags;         // An associative array of locations of start tags on the stack.
+    protected startTags: Record<string, number[]>;         // An associative array of locations of start tags on the stack.
     protected allowAmpersand: boolean;     // If true, we use String.replaceAll() instead of htmlEncode().
     protected tagMarker: string;           // Set to '[', '<', '{', or '('.
     protected ignoreNewlines;              // If true, newlines will be treated as normal whitespace.
@@ -89,7 +89,7 @@ export default class BBCode {
         this.postTrim = "";
         this.rootClass = 'block';
         this.lostStartTags = {};
-        this.startTags = 0;
+        this.startTags = {};
         this.tagMarker = '[';
         this.allowAmpersand = false;
         this.currentClass = this.rootClass;
