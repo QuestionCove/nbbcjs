@@ -1993,7 +1993,9 @@ export default class BBCode {
         // We don't need to run a BBCODE_CHECK on the start tag, because it was already
         // done when the tag was pushed onto the stack.
         const startTagNode = this.stack.pop();
-        const startTagParams = startTagNode[BBStack.TAG];
+        let startTagParams = startTagNode[BBStack.TAG];
+        if (!startTagParams) 
+            startTagParams = {};
         this.computeCurrentClass();
         if (this.tagRules[tagName] && this.tagRules[tagName]['before_tag']) {
             this.cleanupWSByPoppingStack(this.tagRules[tagName]['before_tag'], this.stack);
