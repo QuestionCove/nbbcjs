@@ -64,7 +64,9 @@ console.log(text);
 //Output: <b>Hello World!</b>
 ```
 
-This documentation is not yet complete, for additional documentation that doesn't exist in the other documentation files, it is highly encouraged to check out the [PHP documentation](https://nbbc.sourceforge.net/#manual) and take note of the changes listed below
+Also check out the fairly comprehensive [API Documentation](https://questioncove.github.io/nbbcjs/)!
+
+If you still need help and everything above isn't enough, for additional documentation that doesn't exist in the other documentation files, it is highly encouraged to check out the [PHP documentation](https://nbbc.sourceforge.net/#manual) and take note of the changes listed below
 
 ## Changes between NBBC PHP and JS/TS
 
