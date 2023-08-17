@@ -16,12 +16,8 @@
     "nbbc",
     "extensible",
     "fast",
-    "library",
-    "front-end",
-    "back-end",
     "emoji",
-    "formatting",
-    "html"
+    "formatting"
   ],
   "engines": {
     "node": ">=16"
