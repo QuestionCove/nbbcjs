@@ -73,7 +73,11 @@ export default class BBCodeLexer {
      * Pattern for matching wiki-links.
      */
     public patWiki: RegExp;
-    
+    /**
+     * Regex generated from {@link patMain} to remove escape characters from escaped tags
+     */
+    public escapeRegex: RegExp;
+
     /**
      * Instantiate a new instance of the {@link BBCodeLexer} class.
      *
@@ -120,33 +124,46 @@ export default class BBCodeLexer {
         // know how things like (?!) and (?:) and (?=) work. Unfortanetly the /x modifier
         // doesn't exist here to make this a *lot* more legible and debuggable, so it's
         // been modified to stretch across multiple lines with the comments edited.
-        this.patMain = "/("
+        this.patMain = "("
             // Match tags, as long as they do not start with [-- or [' or [!-- or [rem or [[.
             // Tags may contain "quoted" or 'quoted' sections that may contain [ or ] characters.
             // Tags may not contain newlines.
-            +`${start}`
+            +`(?<!\\\\)${start}`
             +`(?!--|'|!--|${start}${start})`
             +`(?:[^\\n\\r${start}${end}]|\\"[^\\"\\n\\r]*\\"|\\'[^\\'\\n\\r]*\\')*`
             +`${end}`
             // Match wiki-links, which are of the form [[...]] or [[...|...]].  Unlike
             // tags, wiki-links treat " and ' marks as normal input characters; but they
             // still may not contain newlines.
-            +`|${start}${start}(?:[^${end}\\r\\n]|${end}[^${end}\\r\\n]){1,256}${end}${end}`
+            +`|(?<!\\\\)${start}${start}(?:[^${end}\\r\\n]|${end}[^${end}\\r\\n]){1,256}${end}${end}`
             // Match single-line comments, which start with [-- or [' or [rem .
-            +`|${start}(?:--|')(?:[^${end}\\n\\r]*)${end}`
+            +`|(?<!\\\\)${start}(?:--|')(?:[^${end}\\n\\r]*)${end}`
             // Match multi-line comments, which start with [!-- and end with --] and contain
             // no --] in between.
-            +`|${start}!--(?:[^-]|-[^-]|--[^${end}])*--${end}`
+            +`|(?<!\\\\)${start}!--(?:[^-]|-[^-]|--[^${end}])*--${end}`
             // Match five or more hyphens as a special token, which gets returned as a [rule] tag.
-            +"|-----+"
+            +"|(?<!\\\\)-----+"
             // Match newlines, in all four possible forms.
             +"|\\x0D\\x0A|\\x0A\\x0D|\\x0D|\\x0A"
             // Match whitespace, but only if it butts up against a newline, rule, or
             // bracket on at least one end.
             +`|[\\x00-\\x09\\x0B-\\x0C\\x0E-\\x20]+(?=[\\x0D\\x0A${start}]|-----|$)`
             +`|(?<=[\\x0D\\x0A${end}]|-----|^)[\\x00-\\x09\\x0B-\\x0C\\x0E-\\x20]+`
-            +")/Dx";
+            +")";
         this.input = preg_split(this.patMain, string, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        this.escapeRegex = new RegExp(this.patMain.replaceAll("(?<!\\\\)", "(\\\\)"), "g");
+        for (const input in this.input) {
+            const value = this.input[input];
+            this.input[input] = value.replace(this.escapeRegex, function(match) {
+                // If there's a backslash before the match, remove it
+                if (match[0] === '\\') {
+                    return match.slice(1); // Remove the backslash
+                }
+                return match; 
+            });
+        }
+
         // Patterns for matching specific types of tokens during lexing. (originally contained Dx flags)
         this.patComment = new RegExp(`^${start}(?:--|')`);
         this.patComment2 = new RegExp(`^${start}!--(?:[^-]|-[^-]|--[^${end}])*--${end}$`);
