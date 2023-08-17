@@ -1,6 +1,6 @@
 {
   "name": "nbbcjs",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "NodeJS Implementation of the PHP NBBC BBCode Parser, a fast extensible BBCode parser",
   "main": "build/src/nbbc.js",
   "types": "build/src/nbbc.d.ts",

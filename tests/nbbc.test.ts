@@ -824,6 +824,11 @@ const tests = {
             descr: "[list=armenian] should produce an ordered list.",
             bbcode: "[list=armenian][*]One Box[*]Two Boxes[*]Three Boxes[/list]",
             html: '\n<ol class="bbcode_list" style="list-style-type:armenian">\n<li>One Box</li>\n<li>Two Boxes</li>\n<li>Three Boxes</li>\n</ol>\n',
+        },
+        {
+            descr: "List should always properly parse",
+            bbcode: "[list] [list] [*] test [/list]",
+            html: "\n<ul class=\"bbcode_list\">\n<li>test</li>\n</ul>\n"
         }
     ],
     "Extensibility": [
@@ -831,6 +836,13 @@ const tests = {
             descr: "BBMode.CALLBACK works with callback function in TagType.callback",
             bbcode: "[border=red]bordered text[/border]",
             html: "<div style=\"border: 1px solid red\">bordered text</div>"
+        }
+    ],
+    "Misc Tests": [
+        {
+            descr: "Complex document test",
+            bbcode: `[center] [size=48] [font=Comic Sans MS] [color=#FF0000]D[/color][color=#FFBF00][sub]A[/color] [color=#00FF3F]R[/color][color=#00FEFF][sup]U[/color][color=#003FFF]L[/color][color=#7F00FF][sub]E[/color][color=#FF00BF]S[/color] [/center] [rule] [list] [*] entry 2 [list] [*] entry [*] [quote="a quote"] tested :( [/list] [*] minecraft bricks [list] [*] [img]https://media.moddb.com/images/downloads/1/218/217860/brickwall.jpg[/img] [list] [*] These got me all bricked up [/list] test [color=green][size=60]test [/color] [b][i][u][s]test[spoiler]test[/spoiler] [br] [spoiler]test[/spoiler] [br][acronym]test[/acronym] [br][acronym=test]testing[/acronym][br][url=questioncove.com target=_blank title="QuestionCove"]QuestionCove[/url][br][url]/test[/url][br][img]/test.png[/img][br][[wiki]][br][wiki=test][br][email]test@test.com[/email]\n--------\n[br][br]\n[left]test[right]test[center]test[rtl]testing\n[indent]test\n[/left][/right][/center][/rtl]\n[indent]test[br]\n[columns]test[nextcol]test[nextcol]test[/columns]`,
+            html: `\n<div class="bbcode_center" style="text-align:center">\n<span style="font-size:48px"> <span style="font-family:'Comic Sans MS'"> <span style="color:#FF0000">D</span><span style="color:#FFBF00"><sub>A</sub></span> <span style="color:#00FF3F">R</span><span style="color:#00FEFF"><sup>U</sup></span><span style="color:#003FFF">L</span><span style="color:#7F00FF"><sub>E</sub></span><span style="color:#FF00BF">S</span> </span></span>\n</div>\n\n<hr class="bbcode_rule" />\n\n<ul class="bbcode_list">\n<li>entry 2\n<ul class="bbcode_list">\n<li>entry</li>\n<li>\n<div class="bbcode_quote">\n<div class="bbcode_quote_head">a quote wrote:</div>\n<div class="bbcode_quote_body">tested <img src="emoji/frown.gif" alt=":(" title=":(" class="bbcode_emoji bbcode_smiley" /></div>\n</div>\n</li>\n</ul>\n</li>\n<li>minecraft bricks\n<ul class="bbcode_list">\n<li><img src="https://media.moddb.com/images/downloads/1/218/217860/brickwall.jpg" alt="brickwall.jpg" class="bbcode_img" />\n<ul class="bbcode_list">\n<li>These got me all bricked up</li>\n</ul>\ntest <span style="color:green"><span style="font-size:1.0em">test </span></span> <b><i><u><strike>test<span class="bbcode_spoiler">test</span><br>\n<span class="bbcode_spoiler">test</span><br>\n<span class="bbcode_acronym" title="">test</span><br>\n<span class="bbcode_acronym" title="test">testing</span><br>\n<a href="questioncove.com" class="bbcode_url">QuestionCove</a><br>\n<a href="/test" class="bbcode_url">/test</a><br>\n<img src="/test.png" alt="test.png" class="bbcode_img" /><br>\n<a href="/?page=wiki" class="bbcode_wiki">wiki</a><br>\n<a href="/?page=test" class="bbcode_wiki">test</a><br>\n<a href="mailto:test@test.com" class="bbcode_email">test@test.com</a><br>\n</strike></u></i></b>\n<hr class="bbcode_rule" />\n<br>\n<br>\n\n<div class="bbcode_left" style="text-align:left">\ntest\n<div class="bbcode_right" style="text-align:right">\ntest\n<div class="bbcode_center" style="text-align:center">\ntest<div style="direction:rtl;">testing<br>\n</div>\n<div class="bbcode_indent" style="margin-left:4em">\ntest\n</div>\n\n</div>\n\n</div>\n\n</div>\n\n<div class="bbcode_indent" style="margin-left:4em">\ntest<br>\n\n<table class="bbcode_columns"><tbody><tr><td class="bbcode_column bbcode_firstcolumn">\ntest\n</td><td class="bbcode_column">\ntest\n</td><td class="bbcode_column">\ntest\n</td></tr></tbody></table>\n\n</div>\n</li>\n</ul>\n</li>\n</ul>\n`
         }
     ]
 };
@@ -865,16 +877,19 @@ bbcode.addRule('border', {
         return `<div style="border: ${size}px solid ${color}">${content}</div>`;
     },
 });
+
 bbcode.setLocalImgDir("smileys");
 bbcode.setLocalImgURL("smileys");
 
 for (const testcat in tests) {
     describe(testcat, () => {
+        bbcode.setDebug(false);
         for (const test of tests[testcat]) {
             it(test.descr, (done) => {
-                if (test['debug'] == true)
+                /*if (test['debug'] == true)
                     bbcode.setDebug(true);
-                else bbcode.setDebug(false);
+                else bbcode.setDebug(false);*/
+                bbcode.setDebug(true);
                 bbcode.setTagMarker('[');
                 bbcode.setAllowAmpersand(false);
                 if (test['newline_ignore'] == true) bbcode.setIgnoreNewlines(true);

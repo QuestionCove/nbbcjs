@@ -23,6 +23,7 @@
         "@typescript-eslint/no-this-alias": "off",
         "@typescript-eslint/no-unsafe-declaration-merging": "warn",
         "@typescript-eslint/no-unused-vars" : "off", //TODO: Change to warn
+        "@typescript-eslint/ban-ts-comment": "off",
         "indent": [
             "warn",
             4
