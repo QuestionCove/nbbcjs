@@ -237,17 +237,47 @@ export default class BBCode {
     }
     //-----------------------------------------------------------------------------
     // State control.
+    /**
+     * Controls how (non-newline) whitespace and newlines are treated when placed in proximity to this tag or to its end tag. For each setting, you use a simple pattern comprised of the following characters to describe what to remove:
+     * - s: Remove any non-newline whitespace found.
+     * - n: Remove a single newline, if one exists.
+     * - a: Remove as many spaces and newlines as are found.
+     * 
+     * Common Examples:
+     * - s: Remove all non-newline whitespace
+     * - sn: Remove all non-newline whitespace, then a single newline if it exists.
+     * - ns: Remove a single newline if it exists, then all non-newline whitespace.
+     * - sns: Remove all non-newline whitespace, then a single newline if it exists, then any non-newline whitespace found past that newline.
+     */
     public setPreTrim(trim = "a") {
         this.preTrim = trim;
         return this;
     }
+    /**
+     * Get the current preTrim value, see {@link setPreTrim}
+     */
     public getPreTrim() {
         return this.preTrim;
     }
+    /**
+     * Controls how (non-newline) whitespace and newlines are treated when placed in proximity to this tag or to its end tag. For each setting, you use a simple pattern comprised of the following characters to describe what to remove:
+     * - s: Remove any non-newline whitespace found.
+     * - n: Remove a single newline, if one exists.
+     * - a: Remove as many spaces and newlines as are found.
+     * 
+     * Common Examples:
+     * - s: Remove all non-newline whitespace
+     * - sn: Remove all non-newline whitespace, then a single newline if it exists.
+     * - ns: Remove a single newline if it exists, then all non-newline whitespace.
+     * - sns: Remove all non-newline whitespace, then a single newline if it exists, then any non-newline whitespace found past that newline.
+     */
     public setPostTrim(trim = "a") {
         this.postTrim = trim;
         return this;
     }
+    /**
+     * Get the current preTrim value, see {@link setPostTrim}
+     */
     public getPostTrim() {
         return this.postTrim;
     }
@@ -317,45 +347,90 @@ export default class BBCode {
     public getLogLevel() {
         return Debugger.level;
     }
+    /**
+     * Set if the parser should allow Ampersand or not.
+     * @param enable 
+     */
     public setAllowAmpersand(enable = true) {
         this.allowAmpersand = enable;
         return this;
     }
+    /**
+     * Get if Ampersand should be allowed or not.
+     */
     public getAllowAmpersand() {
         return this.allowAmpersand;
     }
+    /**
+     * Set the Tag Marker the parser should use, see {@link tagMarker}
+     * @param marker The marker
+     * @returns {this}
+     */
     public setTagMarker(marker = '[') {
         this.tagMarker = marker;
         return this;
     }
+    /**
+     * Get the current Tag Marker
+     */
     public getTagMarker() {
         return this.tagMarker;
     }
+    /**
+     * Sets whether the parser should ignore newlines or not.
+     * @param ignore Whether to ignore newlines
+     * @returns {this}
+     */
     public setIgnoreNewlines(ignore = true) {
         this.ignoreNewlines = ignore;
         return this;
     }
+    /**
+     * Get if newlines are ignored.
+     */
     public getIgnoreNewlines() {
         return this.ignoreNewlines;
     }
+    /**
+     * Set the maximum amount of output characters before the output gets cut off
+     * @param limit maximum characters
+     */
     public setLimit(limit = 0) {
         this.outputLimit = limit;
         return this;
     }
+    /**
+     * Get the current maximum output limit.
+     */
     public getLimit() {
         return this.outputLimit;
     }
+    /**
+     * Set what gets appended to the end of a string when the string is too long.
+     * @param tail What to append
+     */
     public setLimitTail(tail = "...") {
         this.limitTail = tail;
         return this;
     }
+    /**
+     * Get the current Limit Tail
+     */
     public getLimitTail() {
         return this.limitTail;
     }
+    /**
+     * Set how precise {@link BBCodeLexer.guessTextLength} should be
+     * @param prec Precision
+     */
     public setLimitPrecision(prec = 0.15) {
         this.limitPrecision = prec;
         return this;
     }
+    /**
+     * Get how precise {@link BBCodeLexer.guessTextLength} should be
+     * @param prec Precision
+     */
     public getLimitPrecision() {
         return this.limitPrecision;
     }
@@ -405,53 +480,101 @@ export default class BBCode {
         this.urlPattern = pattern;
         return this;
     }
+    /**
+     * Get the current URL Pattern
+     */
     public getURLPattern() {
         return this.urlPattern;
     }
+    /**
+     * If true, [url] tags can accept a target="..." parameter.
+     * @param enable
+     */
     public setURLTargetable(enable: boolean) {
         this.urlTargetable = enable;
         return this;
     }
+    /**
+     * Whether [url] tags acan accept a target="..." parameter
+     */
     public getURLTargetable() {
         return this.urlTargetable;
     }
+    /**
+     * If non-false, [url] tags will use this target and no other.
+     * @param target 
+     */
     public setURLTarget(target) {
         this.urlTarget = target;
         return this;
     }
+    /**
+     * Get the current forced url target
+     */
     public getURLTarget() {
         return this.urlTarget;
     }
+    /**
+     * Set the template to use for URL tags
+     * @param template 
+     * @returns {this}
+     */
     public setURLTemplate(template: string) {
         this.urlTemplate = template;
         return this;
     }
+    /**
+     * Get the current URL Template
+     */
     public getURLTemplate() {
         return this.urlTemplate;
     }
+    /**
+     * Set the template to use for quote tags
+     * @param template 
+     * @returns {this}
+     */
     public setQuoteTemplate(template: string) {
         this.quoteTemplate = template;
         return this;
     }
+    /**
+     * Get the current template to use for quote tags
+     */
     public getQuoteTemplate() {
         return this.quoteTemplate;
     }
+    /**
+     * Set the the default template used when rendering wiki links.
+     * @param template 
+     * @returns {this}
+     */
     public setWikiURLTemplate(template: string) {
         this.wikiUrlTemplate = template;
         return this;
     }
+    /**
+     * Get the current wiki template
+     */
     public getWikiURLTemplate() {
         return this.wikiUrlTemplate;
     }
+    /**
+     * Set the template to use for emails
+     * @param template template html
+     */
     public setEmailTemplate(template: string) {
         this.emailTemplate = template;
         return this;
     }
+    /**
+     * Get the current email template
+     */
     public getEmailTemplate() {
         return this.emailTemplate;
     }
     /**
-     * Set the value for escape_content.
+     * Set whether content should be escaped or not. POTENTIALLY DANGEROUS IF DISABLED. ONLY DISABLE IF YOU KNOW WHAT YOURE DOING.
      *
      * @param escapeContent
      * @return {this}
@@ -540,43 +663,86 @@ export default class BBCode {
     //-----------------------------------------------------------------------------
     // Handling for [[wiki]] and [[wiki|Wiki]] links and other replaced items.
     // These are basically getter/setter functions that exist for convenience.
+    /**
+     * Get the wiki URL use for wiki tags and replacements
+     * @param url URL to use for wikis
+     * @returns {this}
+     */
     public setWikiURL(url: string) {
         this.wikiUrl = url;
         return this;
     }
+    /**
+     * Get the current Wiki URL
+     */
     public getWikiURL() {
         return this.wikiUrl;
     }
+    /**
+     * Get the default wiki URL
+     */
     public getDefaultWikiURL() {
         return '/?page=';
     }
+    /**
+     * Set the directory path to local images
+     * @param path directory path
+     */
     public setLocalImgDir(path: string) {
         this.localImgDir = path;
         return this;
     }
+    /**
+     * Get the current local image directory
+     */
     public getLocalImgDir() {
         return this.localImgDir;
     }
+    /**
+     * Get the default local image Directory
+     */
     public getDefaultLocalImgDir() {
         return "img";
     }
+    /**
+     * Set the URL path to use for local images
+     * @param path url path
+     * @returns {this}
+     */
     public setLocalImgURL(path: string) {
         this.localImgUrl = path.replace(/\/+$/, '');
         return this;
     }
+    /**
+     * Get the current local img URL
+     */
     public getLocalImgURL() {
         return this.localImgUrl;
     }
+    /**
+     * Get the default local img URL
+     */
     public getDefaultLocalImgURL() {
         return "img";
     }
+    /**
+     * Sets the HTML to use when converting a rule tag
+     * @param html HTML for Rule tag
+     * @returns 
+     */
     public setRuleHTML(html) {
         this.ruleHtml = html;
         return this;
     }
+    /**
+     * Returns the current Rule HTML
+     */
     public getRuleHTML() {
         return this.ruleHtml;
     }
+    /**
+     * Gets the default Rule HTML
+     */
     public getDefaultRuleHTML() {
         return "\n<hr class=\"bbcode_rule\" />\n";
     }
@@ -670,6 +836,9 @@ export default class BBCode {
     public getEmojiDir() {
         return this.emojiDir;
     }
+    /**
+     * Get the default emoji directory
+     */
     public getDefaultEmojiDir() {
         return "emoji";
     }
@@ -687,6 +856,9 @@ export default class BBCode {
     public getEmojiURL() {
         return this.emojiUrl;
     }
+    /**
+     * Get the default emoji URL
+     */
     public getDefaultEmojiURL() {
         return "emoji";
     }
@@ -728,9 +900,8 @@ export default class BBCode {
     //-----------------------------------------------------------------------------
     //  Emoji, URL, and HTML-conversion support routines.
     /**
-     * Like PHP's built-in nl2br, but this one can convert Windows, Un*x, or Mac
-     * newlines to a <br>, and regularizes the output to just use Un*x-style
-     * newlines to boot.
+     * Converts Windows, Unix, or Mac newlines to a <br>, and regularizes the 
+     * output to just use Unix-style newlines to boot.
      */
     public nl2br(string: string): string {
         return string.replace(/\x0A|\x0D|\x0A\x0D|\x0D\x0A/g, "<br>\n");
