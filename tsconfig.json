@@ -14,6 +14,10 @@
 	   "sourceMap": true,
 	   "allowJs": true,
 	   "declaration": true,
-	}
+	},
+	"exclude": [
+		"./tests/*",
+		"./build/*"
+	]
 	//"include": ["**/*.ts"]
  }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DebugLevel } from "../@types/enums";
 import Debugger from "../src/debugger";
 
