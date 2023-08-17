@@ -251,21 +251,42 @@ export default class BBCode {
     public getPostTrim() {
         return this.postTrim;
     }
+    /**
+     * Sets {@link rootClass}; see {@link ClassType}
+     * @returns {this}
+     */
     public setRoot(rootclass: ClassType = 'block') {
         this.rootClass = rootclass;
         return this;
     }
+    /**
+     * Sets {@link rootClass} to inline; see {@link ClassType}
+     * @returns {this}
+     */
     public setRootInline() {
         this.rootClass = 'inline';
         return this;
     }
+    /**
+     * Sets {@link rootClass} to block; see {@link ClassType}
+     * @returns {this}
+     */
     public setRootBlock() {
         this.rootClass = 'block';
         return this;
     }
+    /**
+     * Gets {@link rootClass}
+     */
     public getRoot() {
         return this.rootClass;
     }
+    /**
+     * Set Debug mode, if enabled it will log debug events.
+     * @default true
+     * @param enable Whether to enable debug mode or not
+     * @returns {this}
+     */
     public setDebug(enable: boolean = true) {
         this.debug = enable;
         if (this.debug) 
@@ -274,6 +295,9 @@ export default class BBCode {
             Debugger.level = DebugLevel.error;
         return this;
     }
+    /**
+     * Get if Debug mode is enabled
+     */
     public getDebug() {
         return this.debug;
     }
@@ -285,7 +309,7 @@ export default class BBCode {
      * 3 is warn (default)
      * 4 is error
      * 5 is none 
-     * @param level DebugLevel
+     * @param level {@link DebugLevel}
      */
     public setLogLevel(level: DebugLevel) {
         Debugger.level = level;
@@ -335,20 +359,48 @@ export default class BBCode {
     public getLimitPrecision() {
         return this.limitPrecision;
     }
+    /**
+     * If plain mode is enabled, it will only output the values as defined in the
+     * plain_start and plain_end in the Tag Library, see {@link TagRules}
+     * @default true
+     * @param enable Enable or Disable Plain Mode
+     * @returns {this}
+     */
     public setPlainMode(enable = true) {
         this.plainMode = enable;
         return this;
     }
+    /**
+     * Get if plain mode is enabled
+     * @returns {boolean}
+     */
     public getPlainMode() {
         return this.plainMode;
     }
+    /**
+     * Sets if URL detection should be abled, if enabled
+     * it will automatically convert urls into <a> tags in html
+     * @default true
+     * @param enable If auto URL detection should be enabled
+     * @returns {this}
+     */
     public setDetectURLs(enable = true) {
         this.detectURLs = enable;
         return this;
     }
+    /**
+     * Get if URL Detection is enabled
+     * @returns {boolean}
+     */
     public getDetectURLs() {
         return this.detectURLs;
     }
+    /**
+     * Sets the URL pattern for a URL, example: 
+     * `<a href="{$url/h}" class="bbcode_url"{$target/v}>{$content/v}</a>`
+     * @param pattern The HTML pattern for a URL
+     * @returns {this}
+     */
     public setURLPattern(pattern) {
         this.urlPattern = pattern;
         return this;
@@ -402,7 +454,7 @@ export default class BBCode {
      * Set the value for escape_content.
      *
      * @param escapeContent
-     * @return this
+     * @return {this}
      */
     public setEscapeContent(escapeContent: boolean) {
         this.escapeContent = escapeContent;
@@ -411,7 +463,7 @@ export default class BBCode {
     /**
      * Get the current value of escapeContent.
      *
-     * @return bool
+     * @return {boolean}
      */
     public getEscapeContent() {
         return this.escapeContent;
@@ -419,24 +471,52 @@ export default class BBCode {
     //-----------------------------------------------------------------------------
     // Rule-management:  You can add your own custom tag rules, or use the defaults.
     // These are basically getter/setter functions that exist for convenience.
+    /**
+     * Adds a rule to the BBCode parser
+     * @param name The name of the rule to add
+     * @param rule The actual rule to add, see {@link TagRules}
+     * @returns {this}
+     */
     public addRule(name: string, rule: TagRules) {
         this.tagRules[name] = rule;
         return this;
     }
+    /**
+     * Removes a {@link TagRules} by name.
+     * @param name The name of the rule to remove
+     * @returns 
+     */
     public removeRule(name: string) {
         delete this.tagRules[name];
         return this;
     }
+    /**
+     * Get a {@link TagRules} by name, returns false if no rule found.
+     */
     public getRule(name: string) {
         return this.tagRules[name] ? this.tagRules[name] : false;
     }
+    /**
+     * Clears all {@link TagRules} from the parser, this is useful
+     * if you plan to replace all the rules with custom ones.
+     * @returns {this}
+     */
     public clearRules() {
         this.tagRules = {};
         return this;
     }
+    /**
+     * Gets a rule from the default rules list
+     * @param name Rule to get from the defaults
+     * @returns 
+     */
     public getDefaultRule(name: string) {
         return this.defaults.defaultTagRules[name] ? this.defaults.defaultTagRules[name] : false;
     }
+    /**
+     * Resets a rule by name from the default tag rules.
+     * @param name Rule to change to default
+     */
     public setDefaultRule(name: string) {
         if (this.defaults.defaultTagRules[name]) {
             this.addRule(name, this.defaults.defaultTagRules[name]);
@@ -444,9 +524,15 @@ export default class BBCode {
             this.removeRule(name);
         }
     }
+    /**
+     * Returns the list of Default Tag Rules.
+     */
     public getDefaultRules() {
         return this.defaults.defaultTagRules;
     }
+    /**
+     * Resets all tag rules to default.
+     */
     public setDefaultRules() {
         this.tagRules = this.defaults.defaultTagRules;
         return this;
@@ -498,27 +584,55 @@ export default class BBCode {
     // Emoji management.  You can use the default emoji, or add your own.
     // These are *mostly* getter/setter functions, but they also affect the
     // caching of the emoji-processing rules.
+    /**
+     * Adds an emoji to the parser
+     * @param code Name for the Emoji
+     * @param image Image file
+     * @returns {this}
+     */
     public addEmoji(code: string, image: string) {
         this.emoji[code] = image;
         this.emojiRegex = false;
         return this;
     }
+    /**
+     * Removes an Emoji from the parser
+     * @param code Emoji Name
+     * @returns {this}
+     */
     public removeEmoji(code: string) {
         delete this.emoji[code];
         this.emojiRegex = false;
         return this;
     }
+    /**
+     * Get an Emoji from the defined emoji, returns false if nothing found.
+     * @param code Emoji Name
+     */
     public getEmoji(code: string) {
         return this.emoji[code] ? this.emoji[code] : false;
     }
+    /**
+     * Clears all emoji from the parser.
+     * @returns {this}
+     */
     public clearEmoji() {
         this.emoji = {};
         this.emojiRegex = false;
         return this;
     }
+    /**
+     * Get an Emoji from the Default Emoji List.
+     * @param code Emoji Name
+     */
     public getDefaultEmoji(code: string) {
         return this.defaults.defaultEmoji[code] ? this.defaults.defaultEmoji[code] : false;
     }
+    /**
+     * Reset an emoji from the defaultEmoji list.
+     * @param code Emoji Name
+     * @returns {this}
+     */
     public setDefaultEmoji(code: string) {
         if (this.defaults.defaultEmoji[code]) {
             this.emoji[code] = this.defaults.defaultEmoji[code];
@@ -526,41 +640,78 @@ export default class BBCode {
         this.emojiRegex = false;
         return this;
     }
+    /**
+     * Get the list of the default Emoji.
+     */
     public getDefaultEmojis() {
         return this.defaults.defaultEmoji;
     }
+    /**
+     * Reset all emoji back to default.
+     * @returns {this}
+     */
     public setDefaultEmojis() {
         this.emoji = this.defaults.defaultEmoji;
         this.emojiRegex = false;
         return this;
     }
+    /**
+     * Set the Emoji Directory
+     * @param path Emoji Name
+     * @returns {this}
+     */
     public setEmojiDir(path) {
         this.emojiDir = path;
         return this;
     }
+    /**
+     * Get the current Emoji Directory
+     */
     public getEmojiDir() {
         return this.emojiDir;
     }
     public getDefaultEmojiDir() {
         return "emoji";
     }
+    /**
+     * The URL Path to the Emoji on your Website
+     * @param path URL Path
+     */
     public setEmojiURL(path) {
         this.emojiUrl = path;
         return this;
     }
+    /**
+     * Get the current Emoji URL
+     */
     public getEmojiURL() {
         return this.emojiUrl;
     }
     public getDefaultEmojiURL() {
         return "emoji";
     }
+    /**
+     * Sets whether emoji should be enabled, when enabled emoji like ":)" will be turned
+     * into an HTML image.
+     * @default true
+     * @param enable Whether emoji should be enabled
+     * @returns {this}
+     */
     public setEnableEmoji(enable = true) {
         this.emojiEnabled = enable;
         return this;
     }
+    /**
+     * Get if Emoji parsing is enabled.
+     */
     public getEnableEmoji(): boolean {
         return this.emojiEnabled;
     }
+    /**
+     * Set the maximum amount of emoji that can be parsed in a single string.
+     * @param count Maximum Emoji
+     * @returns 
+     */
     public setMaxEmoji(count: number) {
         this.maxEmoji = count;
         if (this.maxEmoji < -1) {
@@ -568,27 +719,37 @@ export default class BBCode {
         }
         return this;
     }
+    /**
+     * Get the Max Emoji amount.
+     */
     public getMaxEmoji(): number {
         return this.maxEmoji;
     }
     //-----------------------------------------------------------------------------
     //  Emoji, URL, and HTML-conversion support routines.
-    // Like PHP's built-in nl2br, but this one can convert Windows, Un*x, or Mac
-    // newlines to a <br>, and regularizes the output to just use Un*x-style
-    // newlines to boot.
+    /**
+     * Like PHP's built-in nl2br, but this one can convert Windows, Un*x, or Mac
+     * newlines to a <br>, and regularizes the output to just use Un*x-style
+     * newlines to boot.
+     */
     public nl2br(string: string): string {
         return string.replace(/\x0A|\x0D|\x0A\x0D|\x0D\x0A/g, "<br>\n");
     }
-    // This function comes straight from the html-entities package
+    /**
+     * This function comes from the html_entities module
+     * @param string The string to be decoded
+     */
     public unHTMLEncode(string: string): string {
         return htmlDecode(string);
     }
-    // This takes an arbitrary string and makes it a wiki-safe string:  It converts
-    // all characters to be within [a-zA-Z0-9'",.:_-] by converting everything else to
-    // _ characters, compacts multiple _ characters together, and trims initial and
-    // trailing _ characters.  So, for example, [[Washington, D.C.]] would become
-    // "Washington_D.C+", safe to pass through a URL or anywhere else.  All characters
-    // in the extended-character range (0x7F-0xFF) will be URL-encoded.
+    /**
+     * This takes an arbitrary string and makes it a wiki-safe string:  It converts
+     * all characters to be within [a-zA-Z0-9'",.:_-] by converting everything else to
+     * _ characters, compacts multiple _ characters together, and trims initial and
+     * trailing _ characters.  So, for example, [[Washington, D.C.]] would become
+     * "Washington_D.C+", safe to pass through a URL or anywhere else.  All characters
+     * in the extended-character range (0x7F-0xFF) will be URL-encoded.
+     */
     public wikify(string: string): string {
         return encodeURIComponent(string.replace(/[!?;@#$%^&*<>=+`~\x00-\x20_-]+/g, " ").trim().replaceAll(" ", "_"));
     }
@@ -1201,19 +1362,21 @@ export default class BBCode {
         this.computeCurrentClass();
         return output;
     }
-    // We're transitioning into a class that's not allowed inside the current one
-    // (like they tried to put a [center] tag inside a [b] tag), so we need to
-    // unwind the stack, outputting content until we're inside a valid state again.
-    // To do this, we need to walk back down the stack, searching for a class that's
-    // in the given list; when we find one, we output everything above it.  Then we
-    // output everything on the stack from the given height to the top, inclusive,
-    // and pop everything in that range.  This leaves a BBCODE_TEXT element on the
-    // stack that is the fully-outputted version of the content, and its class
-    // will be the same as that of the stack element before it (or root_class if there
-    // is no element before it).
-    //
-    // This returns true if the stack could be rewound to a safe state, or false
-    // if no such "safe state" existed.
+    /**
+     * We're transitioning into a class that's not allowed inside the current one
+     * (like they tried to put a [center] tag inside a [b] tag), so we need to
+     * unwind the stack, outputting content until we're inside a valid state again.
+     * To do this, we need to walk back down the stack, searching for a class that's
+     * in the given list; when we find one, we output everything above it.  Then we
+     * output everything on the stack from the given height to the top, inclusive,
+     * and pop everything in that range.  This leaves a BBCODE_TEXT element on the
+     * stack that is the fully-outputted version of the content, and its class
+     * will be the same as that of the stack element before it (or root_class if there
+     * is no element before it).
+     *
+     * This returns true if the stack could be rewound to a safe state, or false
+     * if no such "safe state" existed.
+     */
     protected rewindToClass(classList: string[]): boolean {
         if (this.debug) {
             Debugger.debug(`Internal_RewindToClass:</b> stack has ${this.stack.length} items; allowed classes are:`, classList);
@@ -1361,8 +1524,12 @@ export default class BBCode {
     }
     //-----------------------------------------------------------------------------
     //  Whitespace cleanup routines (internal).
-    // Walk down from the top of the stack, and remove whitespace/newline tokens from
-    // the top according to the rules in the given pattern.
+    /**
+     * Walk down from the top of the stack, and remove whitespace/newline tokens from
+     * the top according to the rules in the given pattern.
+     * @param pattern Pattern for cleanup
+     * @param array Array to cleanup
+     */
     protected cleanupWSByPoppingStack(pattern: string | undefined, array: StackType[]) {
         if (this.debug) {
             Debugger.debug("Internal_CleanupWSByPoppingStack:", `array has ${array.length} items; pattern="${pattern}"`);
@@ -1396,8 +1563,12 @@ export default class BBCode {
             this.computeCurrentClass();
         }
     }
-    // Read tokens from the input, and remove whitespace/newline tokens from the input
-    // according to the rules in the given pattern.
+    /**
+     * Read tokens from the input, and remove whitespace/newline tokens from the input
+     * according to the rules in the given pattern.
+     * @param pattern Pattern for cleanup
+     * @returns 
+     */
     protected cleanupWSByEatingInput(pattern?: string) {
         if (this.debug)
             Debugger.debug("Internal_CleanupWSByEatingInput:", `input pointer is at ${this.lexer.ptr}; pattern="${pattern}"`);
@@ -1430,8 +1601,13 @@ export default class BBCode {
         if (this.debug)
             Debugger.debug("Internal_CleanupWSByEatingInput:", `input pointer is now at ${this.lexer.ptr}`);
     }
-    // Read tokens from the given position in the stack, going forward as we match
-    // the rules in the given pattern.  Returns the first position *after* the pattern.
+    /**
+     * Read tokens from the given position in the stack, going forward as we match
+     * the rules in the given pattern. Returns the first position *after* the pattern.
+     * @param pattern Pattern for cleanup
+     * @param pos Position to start the cleanup
+     * @param array Stack to cleanup
+     */
     protected cleanupWSByIteratingPointer(pattern: string | undefined, pos: number, array: StackType[]) {
         if (this.debug) {
             Debugger.debug("Internal_CleanupWSByIteratingPointer:", `pointer is ${pos}; pattern="${pattern}"`);
@@ -1461,9 +1637,13 @@ export default class BBCode {
         }
         return pos;
     }
-    // We have a string that's too long, so chop it off at a suitable break so that it's
-    // no longer than `limit` characters, if at all possible (if there's nowhere to break
-    // before that, we just chop at `limit`).
+    /**
+     * We have a string that's too long, so chop it off at a suitable break so that it's
+     * no longer than `limit` characters, if at all possible (if there's nowhere to break
+     * before that, we just chop at `limit`).
+     * @param string String to limit text length
+     * @param limit Maximum text length
+     */
     protected limitText(string: string, limit: number) {
         if (this.debug) {
             Debugger.debug("Internal_LimitText:", `chopping string of length ${string.length} at ${limit}.`);
@@ -1480,8 +1660,10 @@ export default class BBCode {
             Debugger.debug("Internal_LimitText:", `resulting string is length ${output.length}`);
         return output;
     }
-    // If we've reached the text limit, clean up the stack, push the limit tail,
-    // set the we-hit-the-limit flag, and return.
+    /**
+     * If we've reached the text limit, clean up the stack, push the limit tail,
+     * set the we-hit-the-limit flag, and return.
+     */
     protected doLimit() {
         this.cleanupWSByPoppingStack("a", this.stack);
         if (this.limitTail) {
@@ -1496,29 +1678,31 @@ export default class BBCode {
     }
     //-----------------------------------------------------------------------------
     //  Tag evaluation logic (internal).
-    // Process a tag:
-    //
-    //   `action` is one of BBCODE_CHECK or BBCODE_OUTPUT.  During BBCODE_CHECK, `contents`
-    //        will *always* be the empty string, and this function should return true if
-    //        the tag is legal based on the available information; or it should return
-    //        false if the tag is illegal.  During BBCODE_OUTPUT, `contents` will always
-    //        be valid, and this function should return HTML.
-    //
-    //   `tagName` is the name of the tag being processed.
-    //
-    //   `defaultValue` is the default value given; for example, in [url=foo], it's "foo"+
-    //        This value has NOT been passed through htmlEncode().
-    //
-    //   `params` is an array of key: value parameters associated with the tag; for example,
-    //        in [emoji src=smile alt=:-)], it's `['src': "smile", 'alt': ":-)"]`.
-    //        These keys and values have NOT beel passed through htmlEncode().
-    //
-    //   `contents` is the body of the tag during BBCODE_OUTPUT.  For example, in
-    //        [b]Hello[/b], it's "Hello"+  THIS VALUE IS ALWAYS HTML, not BBCode.
-    //
-    // For BBCODE_CHECK, this must return true (if the tag definition is valid) or false
-    // (if the tag definition is not valid); for BBCODE_OUTPUT, this function must return
-    // HTML output.
+    /**
+     * Process a tag:
+     *
+     *   `action` is one of BBCODE_CHECK or BBCODE_OUTPUT.  During BBCODE_CHECK, `contents`
+     *        will *always* be the empty string, and this function should return true if
+     *        the tag is legal based on the available information; or it should return
+     *        false if the tag is illegal.  During BBCODE_OUTPUT, `contents` will always
+     *        be valid, and this function should return HTML.
+     *
+     *   `tagName` is the name of the tag being processed.
+     *
+     *   `defaultValue` is the default value given; for example, in [url=foo], it's "foo"+
+     *        This value has NOT been passed through htmlEncode().
+     *
+     *   `params` is an array of key: value parameters associated with the tag; for example,
+     *        in [emoji src=smile alt=:-)], it's `['src': "smile", 'alt': ":-)"]`.
+     *        These keys and values have NOT beel passed through htmlEncode().
+     *
+     *   `contents` is the body of the tag during BBCODE_OUTPUT.  For example, in
+     *        [b]Hello[/b], it's "Hello"+  THIS VALUE IS ALWAYS HTML, not BBCode.
+     *
+     * For BBCODE_CHECK, this must return true (if the tag definition is valid) or false
+     * (if the tag definition is not valid); for BBCODE_OUTPUT, this function must return
+     * HTML output.
+     */
     public doTag(action: BBAction, tagName: string, defaultValue: string, params: boolean | TagType, contents: string) {
         let tagRule = this.tagRules[tagName] ? this.tagRules[tagName] : undefined;
         let value, plainContent, possibleContent, start, end, link, result;
@@ -1726,13 +1910,15 @@ export default class BBCode {
             return false;
         }
     }
-    // Format an enhanced tag, which is like a simple tag but uses a short HTML template
-    // for its formatting instead.
-    //
-    // The variables you may use are the parameters of the tag, and '_default' for its
-    // default value, '_name' for its name, and '_content' for its contents (body).
-    // Note that in enhanced mode, the tag parameters' keys must match [a-zA-Z0-9_:-]+,
-    // that is, alphanumeric, with underscore, colon, or hyphen.
+    /**
+     * Format an enhanced tag, which is like a simple tag but uses a short HTML template
+     * for its formatting instead.
+     *
+     * The variables you may use are the parameters of the tag, and '_default' for its
+     * default value, '_name' for its name, and '_content' for its contents (body).
+     * Note that in enhanced mode, the tag parameters' keys must match [a-zA-Z0-9_:-]+,
+     * that is, alphanumeric, with underscore, colon, or hyphen.
+     */
     protected doEnhancedTag(tagRule: TagRules, params: boolean | TagType, contents: string): string {
         // Set up the special "_content" and "_defaultcontent" parameters.
         params['_content'] = contents;
@@ -1754,9 +1940,11 @@ export default class BBCode {
     }
     //-----------------------------------------------------------------------------
     //  Parser token-processing routines (internal).
-    // If an end-tag is required/optional but missing, we simulate it here so that the
-    // rule handlers still see a valid '_endtag' parameter.  This way, all rules always
-    // see valid '_endtag' parameters except for rules for isolated tags.
+    /**
+     * If an end-tag is required/optional but missing, we simulate it here so that the
+     * rule handlers still see a valid '_endtag' parameter.  This way, all rules always
+     * see valid '_endtag' parameters except for rules for isolated tags.
+     */
     protected updateParamsForMissingEndTag(params: boolean | TagType) {
         let tailMarker;
         switch (this.tagMarker) {
