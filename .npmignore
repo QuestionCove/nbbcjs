@@ -3,8 +3,12 @@ node_modules
 *.php
 *.txt
 coverage
-nbbc_test.ts
+nbbc_test.*
+*.test.*
 .github
 jest.config.json
 tests
 docs
+src
+modules
+@types
