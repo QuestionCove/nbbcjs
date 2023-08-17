@@ -3,7 +3,6 @@ import webpack from 'webpack';
 const config: webpack.Configuration[] = [{
     name: 'full',
     mode: 'production',
-    devtool: 'source-map',
     entry: './src/nbbc.ts',
     module: {
         rules: [{
@@ -41,7 +40,6 @@ const config: webpack.Configuration[] = [{
 }, {
     name: 'minimized',
     mode: 'production',
-    devtool: 'source-map',
     entry: './src/nbbc.ts',
     module: {
         rules: [{
@@ -76,7 +74,6 @@ const config: webpack.Configuration[] = [{
 }, {
     name: 'full-legacy',
     mode: 'production',
-    devtool: 'source-map',
     entry: './src/nbbc.ts',
     module: {
         rules: [{
@@ -114,7 +111,6 @@ const config: webpack.Configuration[] = [{
 }, {
     name: 'min-legacy',
     mode: 'production',
-    devtool: 'source-map',
     entry: './src/nbbc.ts',
     module: {
         rules: [{

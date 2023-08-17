@@ -4,11 +4,13 @@ node_modules
 *.txt
 coverage
 nbbc_test.*
-*.test.*
 .github
 jest.config.json
-tests
 docs
+doc
+tests
 src
 modules
 @types
+nbbc.legacy.js
+nbbc.js

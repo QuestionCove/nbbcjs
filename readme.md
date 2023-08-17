@@ -42,9 +42,7 @@ Or if you are using this in a browser, we provide 4 prebuilt releases, nbbc.min.
 - *nbbc.legacy.min.js*: Minified version of the code transpiled to allow for most browsers for production
 - *nbbc.legacy.js*: Uncompressed version of the transpiled code for development
 
-Each version comes with optional source maps.
-
-To use the prebuilt version, simply include the javascript file of your choice by downloading it from the releases and including it, or using unpkg:
+To use the prebuilt version, simply include the javascript file of your choice by downloading it from the releases and including it, or using unpkg (unpkg only contains minimized versions):
 
 ```html
 <script src="https://www.unpkg.com/nbbcjs@latest/build/dist/nbbc.min.js"></script>
