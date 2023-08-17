@@ -1997,7 +1997,6 @@ export default class BBCode {
             return;
         }
         this.cleanupWSByPoppingStack(tagRule['before_tag'], this.stack);
-        //TODO: Investigate what doTag outputs and type it
         const output = this.doTag(BBAction.OUTPUT, tagName, tagParams['_default'], tagParams, "");
         this.cleanupWSByEatingInput(tagRule['after_tag']);
         if (this.debug) {
