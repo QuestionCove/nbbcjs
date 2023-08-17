@@ -1,3 +1,8 @@
+/**
+ * This is the EmailAddressValidator Class, it is resposible for 
+ * verifying an input email address so the user can't input 
+ * incorrectly formatted email addresses
+ */
 export default class EmailAddressValidator {
     /**
      * Check email address validity.

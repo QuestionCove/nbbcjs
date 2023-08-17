@@ -11,6 +11,12 @@ import strip_tags from '../modules/strip_tags';
 import basename from '../modules/basename';
 import parse_url from "../modules/parse_url";
 
+/**
+ * This is the BBCodeLibrary class, it is responsible for defining the default
+ * Emoji, the default tags, and providing the functions to parse the default
+ * tags. You can extend this Library and pass it to {@link BBCode} when creating
+ * it, or create new tags using the {@link BBCode.addRule} function.
+ */
 export default class BBCodeLibrary {
     /**
      * @var defaultEmoji Standard library of Emoji definitions.

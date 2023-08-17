@@ -1,3 +1,6 @@
+/**
+ * What Mode a tag should operate in.
+ */
 export enum BBMode {
     /**
      * Swap BBCode tags with HTML tags.
@@ -21,6 +24,9 @@ export enum BBMode {
     ENHANCED = 4
 }
 
+/**
+ * The data that gets stored in each stack entry.
+ */
 export enum BBStack {
     /**
      * Stack node: Token type
@@ -40,6 +46,9 @@ export enum BBStack {
     CLASS = 3
 }
 
+/**
+ * The types of token a stack entry can be.
+ */
 export enum BBToken {
     /**
      * Token: End-of-input
@@ -67,6 +76,9 @@ export enum BBToken {
     ENDTAG = 5
 }
 
+/**
+ * How to handle content
+ */
 export enum BBType {
     /**
      * Content type: Content may not be provided by user.
@@ -86,6 +98,9 @@ export enum BBType {
     VERBATIM = 2
 }
 
+/**
+ * What action is being performed on a function
+ */
 export enum BBAction {
     /**
      * Callback operation: Check validitity of input
@@ -97,6 +112,9 @@ export enum BBAction {
     OUTPUT = 2
 }
 
+/**
+ * Next Token Type for the Lexer
+ */
 export enum LexState {
     /**
      * Lexer: Next token is plain text.
@@ -108,6 +126,9 @@ export enum LexState {
     TAG = 1
 } 
 
+/**
+ * Levels of output for logging
+ */
 export enum DebugLevel {
     all = 0,
     debug = 1,

@@ -1,6 +1,9 @@
 import BBCode from '../src/bbcode';
 import { BBStack, BBToken, BBMode, LexState, BBType, BBAction } from './enums';
 
+/**
+ * The Types for the Parsing Stack
+ */
 export interface StackType {
     /**
      * Token Type
@@ -24,17 +27,62 @@ export interface StackType {
  * Private Tag Types for the parser
  */
 export interface TagTypePrivate {
+    /**
+     * The raw verbatim text of the tag, unparsed. For example, in [font=Arial size=5]...[/font], this will contain "[font=Arial size=5]".
+     */
     _tag?: string,
+    /**
+     * The raw verbatim text of the closing tag, unparsed. For example, in [font=Arial size=5]...[/font], this will contain "[/font]". 
+     * Note that if an end tag is optional, or it's required but the user forgets to provide it, this value will still contain appropriate closing-tag text 
+     * (i.e., the parser will create a suitable end tag).
+     */
     _endtag?: boolean | string,
+    /**
+     * The name of the tag, eg "color", or "url"
+     */
     _name?: string,
+    /**
+     * If a closing tag was provided by the user, this will be set to true; if no closing tag was provided, 
+     * or this tag didn't allow a closing tag, this will be set to false. 
+     * You can use this field to distinguish whether the user has provided a closing tag or not when closing tags are optional.
+     */
     _hasend?: boolean,
+    /**
+     * A boolean value that is false if the tag is a start tag and true if the tag is an end tag.
+     * Note that this will always be false for a callback function, so it's not very useful outside of NBBC's internals.
+     */
     _end?: boolean,
+    /**
+     * The default value of the tag; in [font=Arial size=5] the default value would be "Arial".
+     * If the value doesn't exist, it may be false
+     */
     _default?: boolean | string,
+    /**
+     * The exact parameters of the tag, parsed, in list form. For example, in [font=Arial size=5], this parameter will contain this array:
+     * ```json
+     * [
+     *   {"key": "font", "value": "Arial"},
+     *   {"key": "size", "value": "5"}
+     * ]
+     * ```
+     * While this may appear to be identical to the array that contains it, it's not. 
+     * First, the 0th array element is always set to the tag's default value (even if there is no default value), 
+     * and second, if redundant parameters are provided, this will list them separately. 
+     * For example: [includes file="Larry" file="George" file="Bill"]
+     * ```
+     * [
+     *   {"key": "includes", "value": "},
+     *   {"key": "file", "value": "Larry},
+     *   {"key": "file", "value": "George},
+     *   {"key": "file", "value": "Bill"}
+     * ]
+     */
     _params?: Param[],
 }
 
 /**
  * Public TagTypes for extended tag processing
+ * @extends TagTypePrivate
  */
 export interface TagType extends TagTypePrivate {
     title?: string,
@@ -48,6 +96,9 @@ export interface TagType extends TagTypePrivate {
     [publictypes: string]: string | boolean | Param[] | undefined
 }
 
+/**
+ * Tag Rules Object for the format of tags in the parser
+ */
 export interface TagRules {
     /**
      * The Mode the tag should be operating in
@@ -238,18 +289,48 @@ export interface Param {
     value: string
 }
 
+/**
+ * Lexer State
+ */
 export interface State {
+    /**
+     * The current token being parsed
+     * @memberof BBToken
+     */
     token: BBToken,
+    /**
+     * Raw input text
+     */
     text: string,
+    /**
+     * Current processing tag {@link TagType}, or boolean if none.
+     */
     tag: TagType | boolean,
+    /**
+     * Next state of the lexer's state machine: {@link LexState.TEXT}, or {@link LexState.TAG}/nl/ws
+     */
     state: LexState,
+    /**
+     * Tokenized input
+     */
     input: string[],
+    /**
+     * Read pointer into the input array.
+     */
     ptr: number,
+    /**
+     * Whether to "unget" the last token.
+     */
     unget: boolean,
+    /**
+     * In verbatim mode, we return all input, unparsed, including comments.
+     */
     verbatim: boolean
 }
 
 /**
+ * The types of classes currently defined
+ * 
  * **block**: A rectangular block of text, equivalent to the CSS display:block property. This is generally an outer containing class.
  * *Usually contained by: Blocks, list items, columns.*
  * *Can usually contain: Blocks, inlines, links, lists, columns, images, code*

@@ -1,3 +1,7 @@
+/**
+ * This is the currently unused Profile class, it may be used for 
+ * profiling the various functions to verify their performance levels
+ */
 export default class Profiler {
     start_time: Record<string, number>;
     total_times: Record<string, number>;

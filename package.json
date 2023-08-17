@@ -8,7 +8,8 @@
     "test": "jest",
     "coverage": "jest --collectCoverage --",
     "prepublish": "pnpm run build",
-    "build": "npx tsc && npx webpack"
+    "build": "npx tsc && npx webpack",
+    "builddocs": "npx typedoc .\\src\\nbbc.ts --plugin typedoc-plugin-missing-exports --internalModule Types"
   },
   "keywords": [
     "bbcode",

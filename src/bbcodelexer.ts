@@ -7,22 +7,73 @@ import { Param, State, TagType } from "../@types/dataTypes";
 //Modules
 import preg_split, {PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY} from "../modules/preg_split";
 
+/**
+ * This is the BBCodeLexer class, it is responsible for taking an input and breaking it
+ * into an array of "tokens", which we will walk through to generate the output in the
+ * {@link BBCode} Class
+ */
 export default class BBCodeLexer {
-    public token: BBToken;         // Return token type:  One of the BBCODE_* constants.
-    public text: string;           // Actual exact, original text of token.
-    public tag: TagType | boolean; // If token is a tag, this is the decoded array version.
-    public state: LexState;        // Next state of the lexer's state machine: text, or tag/ws/nl
-    public input: string[];        // The input string, split into an array of tokens.
-    public ptr: number;            // Read pointer into the input array.
-    public unget: boolean;         // Whether to "unget" the last token.
-    public verbatim: boolean;      // In verbatim mode, we return all input, unparsed, including comments.
-    public debug: boolean;         // In debug mode, we dump decoded tags when we find them.
-    public tagMarker: string;      // Which kind of tag marker we're using:  "[", "<", "(", or "{"
-    public endTagMarker: string;   // The ending tag marker:  "]", ">", "(", or "{"
-    public patMain: string|RegExp; // Main tag-matching pattern.
-    public patComment: RegExp;     // Pattern for matching comments.
-    public patComment2: RegExp;    // Pattern for matching comments.
-    public patWiki: RegExp;        // Pattern for matching wiki-links.
+    /**
+     * Return token type:  One of the {@link BBToken} enum values
+     */
+    public token: BBToken;
+    /**
+     *  Actual exact, original text of token.
+     */
+    public text: string;
+    /**
+     * If token is a tag, this is the decoded array version.
+     */
+    public tag: TagType | boolean;
+    /**
+     * Next state of the lexer's state machine: text, or tag/ws/nl
+     */
+    public state: LexState;
+    /**
+     *  The input string, split into an array of tokens.
+     */
+    public input: string[];
+    /**
+     * Read pointer into the input array.
+     */
+    public ptr: number;
+    /**
+     * Whether to "unget" the last token.
+     */
+    public unget: boolean;
+    /**
+     * In verbatim mode, we return all input, unparsed, including comments.
+     */
+    public verbatim: boolean;
+    /**
+     * In debug mode, we dump decoded tags when we find them.
+     */
+    public debug: boolean;
+    /**
+     *  Which kind of tag marker we're using:  "[", "<", "(", or "{"
+     */
+    public tagMarker: string;
+    /**
+     * The ending tag marker:  "]", ">", "(", or "{"
+     */
+    public endTagMarker: string;
+    /**
+     * Main tag-matching pattern.
+     */
+    public patMain: string|RegExp;
+    /**
+     * Pattern for matching comments.
+     */
+    public patComment: RegExp;
+    /**
+     * Pattern for matching comments.
+     */
+    public patComment2: RegExp;
+    /**
+     * Pattern for matching wiki-links.
+     */
+    public patWiki: RegExp;
+    
     /**
      * Instantiate a new instance of the {@link BBCodeLexer} class.
      *

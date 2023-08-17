@@ -17,6 +17,10 @@ import parse_url from "../modules/parse_url";
 import { BBStack, BBToken, BBMode, BBType, BBAction, DebugLevel } from '../@types/enums';
 import { ClassType, Param, StackType, TagRules, TagType } from "../@types/dataTypes";
 
+/**
+ * This is the BBCode Library class, it is responsible for most of the internal parsing
+ * of the input into HTML.
+ */
 export default class BBCode {
     /**
      * Current version number
@@ -25,49 +29,167 @@ export default class BBCode {
     /**
      * Current release date
      */
-    static BBCODE_RELEASE = '2023-08-12';
+    static BBCODE_RELEASE = '2023-08-16';
     //-----------------------------------------------------------------------------
     // Instance variables.  Do not change any of these directly!  Use the
     // access methods provided below.
-    protected tagRules: Record<string, TagRules>;// List of tag rules currently in use.
-    protected defaults: BBCodeLibrary;     // The standard library (an instance of class BBCodeLibrary).
-    protected currentClass: ClassType;     // The current class (auto-computed).
-    protected rootClass: ClassType;        // The root container class.
-    protected lostStartTags: Record<string, number>;// For repair when tags are badly mis-nested.
-    protected startTags: Record<string, number[]>;// An associative array of locations of start tags on the stack.
-    protected allowAmpersand: boolean;     // If true, we use String.replaceAll() instead of htmlEncode().
-    protected tagMarker: string;           // Set to '[', '<', '{', or '('.
-    protected ignoreNewlines;              // If true, newlines will be treated as normal whitespace.
-    protected plainMode: boolean;          // Don't output tags:  Just output text/whitespace/newlines only.
-    protected detectURLs: boolean;         // Should we audo-detect URLs and convert them to links?
-    protected urlPattern: string;          // What to convert auto-detected URLs into.
-    protected outputLimit: number;         // The maximum number of text characters to output.
-    protected textLength: number;          // The number of text characters output so far.
-    protected wasLimited: boolean;         // Set to true if the output was cut off.
-    protected limitTail: string;           // What to add if the output is cut off.
-    protected limitPrecision: number;      // How accurate should we be if we're cutting off text?
-    protected emojiDir: string;            // The host filesystem path to emoji (should be an absolute path).
-    protected emojiUrl: string;            // The URL path to emoji (possibly a relative path).
-    protected emoji;                       // The current list of emoji.
-    protected emojiRegex;                  // This is a regex, precomputed from the list of emoji above.
-    protected emojiEnabled: boolean;       // Whether or not to perform emoji-parsing.
-    protected wikiUrl: string;             // URL prefix used for [[wiki]] links.
-    protected localImgDir: string;         // The host filesystem path to local images (should be an absolute path).
-    protected localImgUrl: string;         // The URL path to local images (possibly a relative path).
-    protected urlTargetable: boolean;      // If true, [url] tags can accept a target="+.+" parameter.
-    protected urlTarget: boolean | string; // If non-false, [url] tags will use this target and no other.
-    protected urlTemplate: string;         // The default template used with the default [url] tag.
-    protected quoteTemplate: string;       // The default template used with the default [quote] tag.
-    protected wikiUrlTemplate: string;     // The default template used when rendering wiki links.
-    protected emailTemplate: string;       // The default template used with the default [email] tag.
-    protected ruleHtml;                    // The default HTML to output for a [rule] tag.
-    protected preTrim: string;             // How to trim the whitespace at the start of the input.
-    protected postTrim: string;            // How to trim the whitespace at the end of the input.
-    public debug: boolean;                 // Enable debugging mode
-    protected maxEmoji: number;            // Maximum number of emoji that can be used in parse
-    protected escapeContent: boolean;      // Encode HTML. POTENTIALLY DANGEROUS IF DISABLED. ONLY DISABLE IF YOU KNOW WHAT YOURE DOING.
-    protected stack: StackType[];          // The token stack is used to perform a document-tree walk
-    protected lexer: BBCodeLexer;          // BBCodeLexer created when calling parse
+    /**
+     * List of tag rules currently in use.
+     */
+    protected tagRules: Record<string, TagRules>;
+    /**
+     * The standard library (an instance of class BBCodeLibrary).
+     */
+    protected defaults: BBCodeLibrary;
+    /**
+     * The current class (auto-computed).
+     */
+    protected currentClass: ClassType;
+    /**
+     * The root container class.
+     */
+    protected rootClass: ClassType;
+    /**
+     * For repair when tags are badly mis-nested.
+     */
+    protected lostStartTags: Record<string, number>;
+    /**
+     * An associative array of locations of start tags on the stack.
+     */
+    protected startTags: Record<string, number[]>;
+    /**
+     * If true, we use String.replaceAll() instead of htmlEncode().
+     */
+    protected allowAmpersand: boolean;
+    /**
+     * Set to '[', '<', '{', or '('.
+     */
+    protected tagMarker: string;
+    /**
+     * If true, newlines will be treated as normal whitespace.
+     */
+    protected ignoreNewlines; 
+    /**
+     * Don't output tags:  Just output text/whitespace/newlines only.
+     */
+    protected plainMode: boolean;
+    /**
+     * Should we audo-detect URLs and convert them to links?
+     */
+    protected detectURLs: boolean; 
+    /**
+     * What to convert auto-detected URLs into.
+     */
+    protected urlPattern: string;
+    /**
+     * The maximum number of text characters to output.
+     */
+    protected outputLimit: number; 
+    /**
+     * The number of text characters output so far.
+     */
+    protected textLength: number;
+    /**
+     * Set to true if the output was cut off.
+     */
+    protected wasLimited: boolean; 
+    /**
+     * What to add if the output is cut off.
+     */
+    protected limitTail: string;
+    /**
+     * How accurate should we be if we're cutting off text?
+     */
+    protected limitPrecision: number;
+    /**
+     * The host filesystem path to emoji (should be an absolute path).
+     */
+    protected emojiDir: string;
+    /**
+     * The URL path to emoji (possibly a relative path).
+     */
+    protected emojiUrl: string;
+    /**
+     * The current list of emoji.
+     */
+    protected emoji;
+    /**
+     *  This is a regex, precomputed from the list of emoji above.
+     */
+    protected emojiRegex;
+    /**
+     * Whether or not to perform emoji-parsing.
+     */
+    protected emojiEnabled: boolean;
+    /**
+     * URL prefix used for [[wiki]] links.
+     */
+    protected wikiUrl: string;
+    /**
+     * The host filesystem path to local images (should be an absolute path).
+     */
+    protected localImgDir: string;
+    /**
+     * The URL path to local images (possibly a relative path).
+     */
+    protected localImgUrl: string;
+    /**
+     * If true, [url] tags can accept a target="..." parameter.
+     */
+    protected urlTargetable: boolean;
+    /**
+     * If non-false, [url] tags will use this target and no other.
+     */
+    protected urlTarget: boolean | string;
+    /**
+     * The default template used with the default [url] tag.
+     */
+    protected urlTemplate: string;
+    /**
+     * The default template used with the default [quote] tag.
+     */
+    protected quoteTemplate: string;
+    /**
+     * The default template used when rendering wiki links.
+     */
+    protected wikiUrlTemplate: string;
+    /**
+     * The default template used with the default [email] tag.
+     */
+    protected emailTemplate: string;
+    /**
+     * The default HTML to output for a [rule] tag.
+     */
+    protected ruleHtml;
+    /**
+     * How to trim the whitespace at the start of the input.
+     */
+    protected preTrim: string;
+    /**
+     * How to trim the whitespace at the end of the input.
+     */
+    protected postTrim: string;
+    /**
+     * Enable debugging mode
+     */
+    public debug: boolean;
+    /**
+     * Maximum number of emoji that can be used in parse
+     */
+    protected maxEmoji: number;
+    /**
+     * Encode HTML. POTENTIALLY DANGEROUS IF DISABLED. ONLY DISABLE IF YOU KNOW WHAT YOURE DOING.
+     */
+    protected escapeContent: boolean;
+    /**
+     * The token stack is used to perform a document-tree walk
+     */
+    protected stack: StackType[];
+    /**
+     * BBCodeLexer created when calling parse
+     */
+    protected lexer: BBCodeLexer;
+
     /**
      * Initialize a new instance of the {@link BBCode} class.
      *

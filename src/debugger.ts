@@ -4,6 +4,9 @@ import { DebugLevel } from "../@types/enums";
 //Imports
 import fs from 'fs';
 
+/**
+ * This is the Debugger class, it is responsible for logging output
+ */
 export default class Debugger {
     public static level: DebugLevel = DebugLevel.warn;
     public static log_file: undefined | string;
