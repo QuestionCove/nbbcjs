@@ -838,6 +838,28 @@ const tests = {
             html: "<div style=\"border: 1px solid red\">bordered text</div>"
         }
     ],
+    "Escaped Character Tests": [
+        {
+            descr: "Basic Escaped functionality works",
+            bbcode: "the \\[b] tag should not be parsed",
+            html: "the [b] tag should not be parsed"
+        },
+        {
+            descr: "Multitag tags like [list] should not be parsed when escaped",
+            bbcode: "\\[list] [*] test1 [*] test2 \\[list] [*] test 1 [/list]",
+            html: "[list] [*] test1 [*] test2 [list] [*] test 1 [/list]"
+        },
+        {
+            descr: "Commented bbcode can also be escaped",
+            bbcode: "\\[-- emergency broadcasting]",
+            html: "[-- emergency broadcasting]"
+        },
+        {
+            descr: "Wiki bbcode can't yet be escaped",
+            bbcode: "\\[[wiki]] \\[[wiki|test]]",
+            html: "\\[[wiki]] \\[[wiki|test]]"
+        }
+    ],
     "Misc Tests": [
         {
             descr: "Complex document test",
