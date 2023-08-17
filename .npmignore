@@ -5,12 +5,7 @@ node_modules
 coverage
 nbbc_test.*
 .github
-jest.config.json
 docs
 doc
-tests
-src
-modules
-@types
 nbbc.legacy.js
 nbbc.js
