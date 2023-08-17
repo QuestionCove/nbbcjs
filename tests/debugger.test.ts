@@ -2,6 +2,11 @@
 import { DebugLevel } from "../@types/enums";
 import Debugger from "../src/debugger";
 
+console.log = function() {};
+console.info = function() {};
+console.warn = function() {};
+console.error = function() {};
+console.debug = function() {};
 describe('Debugger Tests', () => { 
     it("Log Function Tests", function() {
         Debugger.level = DebugLevel.all;

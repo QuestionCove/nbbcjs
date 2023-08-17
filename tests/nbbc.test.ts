@@ -881,6 +881,12 @@ bbcode.addRule('border', {
 bbcode.setLocalImgDir("smileys");
 bbcode.setLocalImgURL("smileys");
 
+console.log = function() {};
+console.info = function() {};
+console.warn = function() {};
+console.error = function() {};
+console.debug = function() {};
+
 for (const testcat in tests) {
     describe(testcat, () => {
         bbcode.setDebug(false);
@@ -914,10 +920,10 @@ for (const testcat in tests) {
 
 
                 try {
-                    if (test['regex']) 
+                    /*if (test['regex']) 
                         expect(new RegExp(test['regex']).test(bbcode.parse(test['bbcode']))).toBe(true);
-                    else
-                        expect(bbcode.parse(test['bbcode'])).toBe(test['html']);
+                    else*/
+                    expect(bbcode.parse(test['bbcode'])).toBe(test['html']);
                     done();
                 } catch (e) {
                     done(e);
