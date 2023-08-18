@@ -6,7 +6,7 @@
   "types": "build/src/nbbc.d.ts",
   "scripts": {
     "test": "jest",
-    "coverage": "jest --collectCoverage --",
+    "coverage": "jest --collectCoverage",
     "prepublish": "pnpm run build",
     "build": "npx tsc && npx webpack",
     "gendocs": "npx typedoc ./src/nbbc.ts --plugin typedoc-plugin-missing-exports --internalModule Types"
