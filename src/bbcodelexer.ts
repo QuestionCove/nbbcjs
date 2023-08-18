@@ -76,7 +76,17 @@ export default class BBCodeLexer {
     /**
      * Regex generated from {@link patMain} to remove escape characters from escaped tags
      */
-    public escapeRegex: RegExp;
+    public genEscapeRegex: RegExp;
+    /** 
+     * The actual Regex used to determine if something should be escaped
+     * Examples: 
+     * - `(?<!\\\\)` Negative lookbehind to make sure there isn't a \ behind the tag (Current)
+     * - `(?:(?<!\\\\)|(?<=\\\\\\\\))` Noncapturing group containing both a negative lookbehind
+     * and a positive lookbehind, to make sure that there isn't a \ behind the tag, or if there
+     * is, make sure that it is 2 \, if there is 2 \, it will still parse the tag.
+     * - Nothing, this will disable escape characters
+     */
+    public escapeRegex: string;
 
     /**
      * Instantiate a new instance of the {@link BBCodeLexer} class.
@@ -116,6 +126,7 @@ export default class BBCodeLexer {
         const start = regexBeginMarkers[tagMarker];
         this.tagMarker = tagMarker;
         this.endTagMarker = endMarkers[tagMarker];
+        this.escapeRegex = "(?<!\\\\)";
         // this.input will be an array of tokens, with the special property that
         // the elements strictly alternate between plain text and tags/whitespace/newlines,
         // and that tags always have *two* entries per tag. The first element will
@@ -128,21 +139,21 @@ export default class BBCodeLexer {
             // Match tags, as long as they do not start with [-- or [' or [!-- or [rem or [[.
             // Tags may contain "quoted" or 'quoted' sections that may contain [ or ] characters.
             // Tags may not contain newlines.
-            +`(?<!\\\\)${start}`
+            +`${this.escapeRegex}${start}`
             +`(?!--|'|!--|${start}${start})`
             +`(?:[^\\n\\r${start}${end}]|\\"[^\\"\\n\\r]*\\"|\\'[^\\'\\n\\r]*\\')*`
             +`${end}`
             // Match wiki-links, which are of the form [[...]] or [[...|...]].  Unlike
             // tags, wiki-links treat " and ' marks as normal input characters; but they
             // still may not contain newlines.
-            +`|(?<!\\\\)${start}${start}(?:[^${end}\\r\\n]|${end}[^${end}\\r\\n]){1,256}${end}${end}`
+            +`|${this.escapeRegex}${start}${start}(?:[^${end}\\r\\n]|${end}[^${end}\\r\\n]){1,256}${end}${end}`
             // Match single-line comments, which start with [-- or [' or [rem .
-            +`|(?<!\\\\)${start}(?:--|')(?:[^${end}\\n\\r]*)${end}`
+            +`|${this.escapeRegex}${start}(?:--|')(?:[^${end}\\n\\r]*)${end}`
             // Match multi-line comments, which start with [!-- and end with --] and contain
             // no --] in between.
-            +`|(?<!\\\\)${start}!--(?:[^-]|-[^-]|--[^${end}])*--${end}`
+            +`|${this.escapeRegex}${start}!--(?:[^-]|-[^-]|--[^${end}])*--${end}`
             // Match five or more hyphens as a special token, which gets returned as a [rule] tag.
-            +"|(?<!\\\\)-----+"
+            +`|${this.escapeRegex}-----+`
             // Match newlines, in all four possible forms.
             +"|\\x0D\\x0A|\\x0A\\x0D|\\x0D|\\x0A"
             // Match whitespace, but only if it butts up against a newline, rule, or
@@ -152,10 +163,10 @@ export default class BBCodeLexer {
             +")";
         this.input = preg_split(this.patMain, string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-        this.escapeRegex = new RegExp(this.patMain.replaceAll("(?<!\\\\)", "(\\\\)"), "g");
+        this.genEscapeRegex = new RegExp(this.patMain.replaceAll(this.escapeRegex, "(\\\\)"), "g");
         for (const input in this.input) {
             const value = this.input[input];
-            this.input[input] = value.replace(this.escapeRegex, function(match) {
+            this.input[input] = value.replace(this.genEscapeRegex, function(match) {
                 // If there's a backslash before the match, remove it
                 if (match[0] === '\\') {
                     return match.slice(1); // Remove the backslash

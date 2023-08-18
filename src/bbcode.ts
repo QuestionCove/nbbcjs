@@ -922,6 +922,7 @@ export default class BBCode {
      * in the extended-character range (0x7F-0xFF) will be URL-encoded.
      */
     public wikify(string: string): string {
+        if (!string) return string;
         return encodeURIComponent(string.replace(/[!?;@#$%^&*<>=+`~\x00-\x20_-]+/g, " ").trim().replaceAll(" ", "_"));
     }
     /**
