@@ -6,6 +6,7 @@ coverage
 nbbc_test.*
 .github
 docs
-doc
+/doc
 nbbc.legacy.js
 nbbc.js
+/emoji
