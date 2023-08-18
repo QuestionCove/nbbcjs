@@ -189,6 +189,10 @@ export default class BBCode {
      * BBCodeLexer created when calling parse
      */
     protected lexer: BBCodeLexer;
+    /**
+     * Whether to allow Escape Characters in parsing to prevent parsing specific tags or not
+     */
+    protected allowEscape: boolean;
 
     /**
      * Initialize a new instance of the {@link BBCode} class.
@@ -234,6 +238,7 @@ export default class BBCode {
         this.maxEmoji = -1;
         this.escapeContent = true;
         this.stack = [];
+        this.allowEscape = true;
     }
     //-----------------------------------------------------------------------------
     // State control.
@@ -528,6 +533,19 @@ export default class BBCode {
      */
     public getURLTemplate() {
         return this.urlTemplate;
+    }
+    /**
+     * Whether to allow BBCode to be escaped or not.
+     */
+    public setAllowEscape(bool: boolean) {
+        this.allowEscape = bool;
+        return this;
+    }
+    /**
+     * Get if escape characters are allowed
+     */
+    public getAllowEscape() {
+        return this.allowEscape;
     }
     /**
      * Set the template to use for quote tags
@@ -2527,7 +2545,7 @@ export default class BBCode {
         // and not a character-by-character tokenizer, the structure of the input
         // must be known in advance, which is why the tag marker cannot be changed
         // during the parse.
-        this.lexer = new BBCodeLexer(string, this.tagMarker, this.debug);
+        this.lexer = new BBCodeLexer(string, this.tagMarker, this.debug, this.allowEscape);
         this.lexer.debug = this.debug;
         // If we're fuzzily limiting the text length, see if we need to actually
         // cut it off, or if it's close enough to not be worth the effort.

@@ -858,6 +858,12 @@ const tests = {
             descr: "Wiki bbcode can't yet be escaped",
             bbcode: "\\[[wiki]] \\[[wiki|test]]",
             html: "\\[[wiki]] \\[[wiki|test]]"
+        },
+        {
+            descr: "BBCode Escape can be disabled",
+            bbcode: "\\[b]test[/b]",
+            html: "\\<b>test</b>",
+            allowEscape: false
         }
     ],
     "Misc Tests": [
@@ -903,7 +909,7 @@ bbcode.addRule('border', {
 bbcode.setLocalImgDir("smileys");
 bbcode.setLocalImgURL("smileys");
 
-console.log = function() {};
+//console.log = function() {};
 console.info = function() {};
 console.warn = function() {};
 console.error = function() {};
@@ -930,16 +936,18 @@ for (const testcat in tests) {
                 if (typeof test['urlforcetarget'] == "string")
                     bbcode.setURLTarget(test['urlforcetarget']);
                 else bbcode.setURLTarget(false);
-                if (test['plainmode'])
+                if (typeof test['plainmode'] !== "undefined")
                     bbcode.setPlainMode(test['plainmode']);
                 else bbcode.setPlainMode(false);
+                if (typeof test["allowEscape"] !== "undefined")
+                    bbcode.setAllowEscape(test["allowEscape"]);
+                else bbcode.setAllowEscape(true);
                 if (test['tag_marker'] == '<') {
                     bbcode.setTagMarker('<');
                     bbcode.setAllowAmpersand(true);
                 }
                 else if (test['tag_marker'])
                     bbcode.setTagMarker(test['tag_marker']);
-
 
                 try {
                     /*if (test['regex']) 

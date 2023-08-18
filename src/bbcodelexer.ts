@@ -87,6 +87,10 @@ export default class BBCodeLexer {
      * - Nothing, this will disable escape characters
      */
     public escapeRegex: string;
+    /**
+     * Whether to allow Escape Characters or not
+     */
+    public allowEscape: boolean;
 
     /**
      * Instantiate a new instance of the {@link BBCodeLexer} class.
@@ -94,7 +98,7 @@ export default class BBCodeLexer {
      * @param string The string to be broken up into tokens.
      * @param tagMarker The BBCode tag marker.
      */
-    public constructor(string: string, tagMarker = '[', debug: boolean = false) {
+    public constructor(string: string, tagMarker = '[', debug: boolean = false, allowEscape: boolean = true) {
         // First thing we do is to split the input string into tuples of
         // text and tags.  This will make it easy to tokenize.  We define a tag as
         // anything starting with a [, ending with a ], and containing no [ or ] in
@@ -126,7 +130,11 @@ export default class BBCodeLexer {
         const start = regexBeginMarkers[tagMarker];
         this.tagMarker = tagMarker;
         this.endTagMarker = endMarkers[tagMarker];
-        this.escapeRegex = "(?<!\\\\)";
+        this.allowEscape = allowEscape;
+        if (allowEscape)
+            this.escapeRegex = "(?<!\\\\)";
+        else 
+            this.escapeRegex = "";
         // this.input will be an array of tokens, with the special property that
         // the elements strictly alternate between plain text and tags/whitespace/newlines,
         // and that tags always have *two* entries per tag. The first element will
@@ -163,16 +171,18 @@ export default class BBCodeLexer {
             +")";
         this.input = preg_split(this.patMain, string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-        this.genEscapeRegex = new RegExp(this.patMain.replaceAll(this.escapeRegex, "(\\\\)"), "g");
-        for (const input in this.input) {
-            const value = this.input[input];
-            this.input[input] = value.replace(this.genEscapeRegex, function(match) {
-                // If there's a backslash before the match, remove it
-                if (match[0] === '\\') {
-                    return match.slice(1); // Remove the backslash
-                }
-                return match; 
-            });
+        if (this.allowEscape) {
+            this.genEscapeRegex = new RegExp(this.patMain.replaceAll(this.escapeRegex, "(\\\\)"), "g");
+            for (const input in this.input) {
+                const value = this.input[input];
+                this.input[input] = value.replace(this.genEscapeRegex, function(match) {
+                    // If there's a backslash before the match, remove it
+                    if (match[0] === '\\') {
+                        return match.slice(1); // Remove the backslash
+                    }
+                    return match; 
+                });
+            }
         }
 
         // Patterns for matching specific types of tokens during lexing. (originally contained Dx flags)
